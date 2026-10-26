@@ -62,6 +62,27 @@ npc_type = "storage"
 position = Vector2(0, -250)
 npc_type = "quest"
 
+[node name="Bram" parent="." instance=ExtResource("6_npc")]
+position = Vector2(-450, 250)
+npc_type = "villager"
+display_name = "Bram"
+chibi_frame = "villager_bram_stand"
+greeting = "The field monsters are restless today."
+
+[node name="Mira" parent="." instance=ExtResource("6_npc")]
+position = Vector2(350, 300)
+npc_type = "villager"
+display_name = "Mira"
+chibi_frame = "villager_mira_stand"
+greeting = "Welcome to town, traveller!"
+
+[node name="Kaze" parent="." instance=ExtResource("6_npc")]
+position = Vector2(-150, -350)
+npc_type = "villager"
+display_name = "Kaze"
+chibi_frame = "villager_kaze_stand"
+greeting = "I train in the shadows."
+
 [node name="Player" parent="." instance=ExtResource("2_player")]
 position = Vector2(0, 300)
 

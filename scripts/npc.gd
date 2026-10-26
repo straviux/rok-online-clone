@@ -7,8 +7,16 @@ extends Node2D
 ## NPC's colour/name come from npc_type, set on the scene instance.
 
 @export var npc_type: String = "shop"
+# Villagers (SetC characters): set these on the scene instance and
+# npc_type = "villager". E then shows the greeting floating above
+# them instead of opening any panel.
+@export var display_name: String = ""
+@export var chibi_frame: String = ""
+@export var greeting: String = ""
 
 var player_near: bool = false
+
+var _damage_number_scene: PackedScene = preload("res://scenes/ui/damage_number.tscn")
 
 @onready var sprite: Sprite2D = $Body/Sprite2D
 @onready var name_label: Label = $NameLabel
@@ -21,7 +29,11 @@ func _ready() -> void:
 	# Frames are 32x64; offset -8 keeps the feet at the bottom of
 	# the 32x48 collision box.
 	sprite.offset = Vector2(0, -8)
-	if npc_type == "storage":
+	if chibi_frame != "":
+		if display_name != "":
+			name_label.text = display_name
+		sprite.texture = ChibiSprites.frame_texture(chibi_frame)
+	elif npc_type == "storage":
 		name_label.text = "Storage"
 		sprite.texture = ChibiSprites.frame_texture("storage_keeper_stand")
 	elif npc_type == "quest":
@@ -52,6 +64,13 @@ func _input(event: InputEvent) -> void:
 		return
 	if event is InputEventKey:
 		if event.keycode == KEY_E and event.pressed and not event.echo:
+			if npc_type == "villager":
+				if greeting != "":
+					var number: Node = _damage_number_scene.instantiate()
+					number.position = global_position + Vector2(0, -60)
+					get_tree().current_scene.add_child(number)
+					number.setup_damage(greeting, Color(1, 1, 1, 1))
+				return
 			var group_name: String = "shop_panel"
 			if npc_type == "storage":
 				group_name = "storage_panel"

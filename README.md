@@ -121,7 +121,12 @@ data in code, and the whole project stays plain text and pushable.
   player is the red-cap, yellow-shirt kid.
 - NPCs: standing chibi frames from the same set, via
   `scripts/chibi_sprites.gd` — shopkeeper (black suit), storage
-  keeper (blue hat), Elder (brown coat).
+  keeper (blue hat), Elder (brown coat), plus three townsfolk
+  from the 8-char expansion (SetC): Bram (bearded man), Mira
+  (blond girl), Kaze (ninja). Villagers are a new `npc_type`:
+  pressing E near one shows a floating greeting instead of
+  opening a panel. Villagers are set on the town scene instance
+  with `display_name`, `chibi_frame`, and `greeting`.
 - Monsters (32x32): slime, mushroom, wolf, skeleton, bat, goblin,
   Dungeon Guardian — pixel grids in `scripts/sprite_data.gd`,
   wired through `MonsterData.sprite_name`, with the old
