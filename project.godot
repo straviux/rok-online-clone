@@ -1,0 +1,26 @@
+; Engine configuration file.
+; Godot 4 project. Open this file in Godot 4 (Project > Import, or just
+; open the folder) and press F5 to run. No external art assets are needed:
+; all Phase 1 visuals are placeholder shapes generated in code / scenes.
+
+config_version=5
+
+[application]
+
+config/name="Ragnarok-like Game"
+run/main_scene="res://scenes/world/town.tscn"
+config/features=PackedStringArray("4.2")
+
+[autoload]
+
+GameManager="*res://scripts/game_manager.gd"
+
+[display]
+
+window/size/viewport_width=1152
+window/size/viewport_height=648
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
