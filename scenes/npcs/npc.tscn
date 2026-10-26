@@ -16,12 +16,7 @@ script = ExtResource("1_npc")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Body"]
 shape = SubResource("RectangleShape2D_npc")
 
-[node name="ColorRect" type="ColorRect" parent="Body"]
-offset_left = -16.0
-offset_top = -24.0
-offset_right = 16.0
-offset_bottom = 24.0
-color = Color(0.6, 0.3, 0.9, 1)
+[node name="Sprite2D" type="Sprite2D" parent="Body"]
 
 [node name="InteractArea" type="Area2D" parent="."]
 
