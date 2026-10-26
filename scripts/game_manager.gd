@@ -18,6 +18,25 @@ var equipment: Dictionary = {
 	"headgear": null,
 	"accessory": null,
 }
+# Player progression, kept here for the same reason as gold and
+# inventory: the Player node is recreated in every world scene, so
+# anything stored only on it (level, XP, stats) reset on every map
+# change. These are the single source of truth; the Player loads
+# them in _ready() and they are captured again before every travel.
+# player_hp/player_sp of -1 means "full on next spawn" (used after
+# death, where the respawn is at full HP/SP).
+var has_player_state: bool = false
+var player_level: int = 1
+var player_xp: int = 0
+var player_stat_points: int = 0
+var player_stat_str: int = 5
+var player_stat_agi: int = 5
+var player_stat_vit: int = 5
+var player_stat_int: int = 5
+var player_stat_dex: int = 5
+var player_stat_luk: int = 5
+var player_hp: float = -1.0
+var player_sp: float = -1.0
 # Phase 5 quests, in chain order. quests[quest_id] is a Dictionary:
 # {"data": QuestData, "state": String, "progress": int}.
 # States: "locked" (earlier quest not done), "available" (talk to the
@@ -26,9 +45,33 @@ var quest_order: Array = ["meet_elder", "slime_hunt", "herb_gathering", "wolf_hu
 var quests: Dictionary = {}
 
 
-func travel_to(scene_path: String, spawn: Vector2) -> void:
+func capture_player_state(player: Node, keep_hp: bool = true) -> void:
+	if player == null:
+		return
+	player_level = player.level
+	player_xp = player.xp
+	player_stat_points = player.stat_points
+	player_stat_str = player.stat_str
+	player_stat_agi = player.stat_agi
+	player_stat_vit = player.stat_vit
+	player_stat_int = player.stat_int
+	player_stat_dex = player.stat_dex
+	player_stat_luk = player.stat_luk
+	if keep_hp:
+		player_hp = player.hp
+		player_sp = player.sp
+	else:
+		player_hp = -1.0
+		player_sp = -1.0
+	has_player_state = true
+
+
+func travel_to(scene_path: String, spawn: Vector2, keep_hp: bool = true) -> void:
 	if scene_path.is_empty():
 		return
+	# Capture before the scene changes, or the old Player (and its
+	# level, XP, and stats) is gone with the old scene.
+	capture_player_state(get_tree().get_first_node_in_group("player"), keep_hp)
 	spawn_position = spawn
 	has_spawn_position = true
 	get_tree().change_scene_to_file(scene_path)

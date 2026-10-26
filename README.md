@@ -143,6 +143,12 @@ real sprite later without changing the collision or movement code.
   If a monster kills you, you respawn in town at full HP/SP.
 - HUD now shows HP, SP, and XP bars, level (with unspent points),
   gold, skill cooldowns, and potion count.
+- Progression lives in `GameManager`, not on the Player node: the
+  Player is recreated in every map, so storing level/XP/stats only
+  on it reset them on every map change. `GameManager` captures them
+  before every portal travel and the new Player loads them on spawn.
+  HP/SP carry over too, except on death, where the town respawn is
+  at full HP/SP with level/XP/stats kept.
 - Potions are not restocked yet — shops and inventory come in Phase 4.
 
 ## Phase 4: items and economy

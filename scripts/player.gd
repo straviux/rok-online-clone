@@ -141,9 +141,25 @@ func gain_xp(amount: int) -> void:
 
 func _ready() -> void:
 	add_to_group("player")
+	# Load progression saved in GameManager before deriving anything:
+	# without this, every new map spawned a fresh level 1 player.
+	if GameManager.has_player_state:
+		level = GameManager.player_level
+		xp = GameManager.player_xp
+		stat_points = GameManager.player_stat_points
+		stat_str = GameManager.player_stat_str
+		stat_agi = GameManager.player_stat_agi
+		stat_vit = GameManager.player_stat_vit
+		stat_int = GameManager.player_stat_int
+		stat_dex = GameManager.player_stat_dex
+		stat_luk = GameManager.player_stat_luk
 	recalculate_derived()
-	hp = float(max_hp)
-	sp = float(max_sp)
+	if GameManager.has_player_state and GameManager.player_hp >= 0.0:
+		hp = min(GameManager.player_hp, float(max_hp))
+		sp = min(GameManager.player_sp, float(max_sp))
+	else:
+		hp = float(max_hp)
+		sp = float(max_sp)
 	# Placeholder art: a plain coloured box until real sprites arrive.
 	# Only generated when no texture has been assigned in the editor.
 	if sprite.texture == null:
@@ -323,8 +339,9 @@ func take_damage(amount: int) -> int:
 
 func _respawn_after_death() -> void:
 	# Brief pause so the killing hit is visible, then respawn in town.
+	# keep_hp=false: level/XP/stats are kept, HP/SP come back full.
 	await get_tree().create_timer(0.5).timeout
-	GameManager.travel_to("res://scenes/world/town.tscn", Vector2(0, 300))
+	GameManager.travel_to("res://scenes/world/town.tscn", Vector2(0, 300), false)
 
 
 func _physics_process(delta: float) -> void:
