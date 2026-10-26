@@ -88,6 +88,7 @@ func _clear_box(box: VBoxContainer) -> void:
 
 func _add_row(box: VBoxContainer, text_value: String, button_text: String, item: ItemData = null) -> Button:
 	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
 	if item != null:
 		var icon_tex: Texture2D = ItemIcons.get_texture(item.item_id)
 		if icon_tex != null:
@@ -100,6 +101,11 @@ func _add_row(box: VBoxContainer, text_value: String, button_text: String, item:
 	var label := Label.new()
 	label.text = text_value
 	label.size_flags_horizontal = 3
+	# Center the text on the row (it used to sit at the top of the
+	# 32px icon row, which made buttons look like they were on the
+	# line below) and clip it instead of letting it run under the button.
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.clip_text = true
 	row.add_child(label)
 	var button := Button.new()
 	button.text = button_text

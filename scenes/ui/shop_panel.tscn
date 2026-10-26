@@ -6,11 +6,11 @@
 script = ExtResource("1_panel")
 
 [node name="Panel" type="ColorRect" parent="."]
-offset_left = 226.0
+offset_left = 76.0
 offset_top = 54.0
-offset_right = 926.0
+offset_right = 1076.0
 offset_bottom = 614.0
-color = Color(0.1, 0.1, 0.15, 0.95)
+color = Color(0.1, 0.1, 0.15, 1)
 
 [node name="TitleLabel" type="Label" parent="Panel"]
 offset_left = 16.0
@@ -20,48 +20,48 @@ offset_bottom = 44.0
 text = "Shop (E near the shopkeeper, Esc to close)"
 
 [node name="CloseButton" type="Button" parent="Panel"]
-offset_left = 600.0
+offset_left = 900.0
 offset_top = 16.0
-offset_right = 684.0
+offset_right = 984.0
 offset_bottom = 44.0
 text = "Close"
 
 [node name="GoldLabel" type="Label" parent="Panel"]
 offset_left = 16.0
 offset_top = 44.0
-offset_right = 684.0
+offset_right = 984.0
 offset_bottom = 72.0
 text = "Gold: 0"
 
 [node name="MessageLabel" type="Label" parent="Panel"]
 offset_left = 16.0
 offset_top = 72.0
-offset_right = 684.0
+offset_right = 984.0
 offset_bottom = 100.0
 text = ""
 
 [node name="StockLabel" type="Label" parent="Panel"]
 offset_left = 16.0
 offset_top = 104.0
-offset_right = 340.0
+offset_right = 480.0
 offset_bottom = 132.0
 text = "Buy"
 
 [node name="StockBox" type="VBoxContainer" parent="Panel"]
 offset_left = 16.0
 offset_top = 132.0
-offset_right = 340.0
+offset_right = 480.0
 offset_bottom = 544.0
 
 [node name="SellLabel" type="Label" parent="Panel"]
-offset_left = 360.0
+offset_left = 500.0
 offset_top = 104.0
-offset_right = 684.0
+offset_right = 984.0
 offset_bottom = 132.0
 text = "Sell (half price)"
 
 [node name="SellBox" type="VBoxContainer" parent="Panel"]
-offset_left = 360.0
+offset_left = 500.0
 offset_top = 132.0
-offset_right = 684.0
+offset_right = 984.0
 offset_bottom = 544.0

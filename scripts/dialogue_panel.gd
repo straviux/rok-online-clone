@@ -15,6 +15,10 @@ var _current_quest_id: String = ""
 
 func _ready() -> void:
 	($Panel as TextureRect).texture = UISprites.get_texture("dialog_box")
+	# The parchment is light, so the default white label text would
+	# vanish on it — use dark brown for the name and body text.
+	name_label.add_theme_color_override("font_color", Color(0.2, 0.13, 0.05, 1))
+	text_label.add_theme_color_override("font_color", Color(0.2, 0.13, 0.05, 1))
 	add_to_group("dialogue_panel")
 	visible = false
 	name_label.text = "Elder"

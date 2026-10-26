@@ -45,5 +45,9 @@ func refresh() -> void:
 			_:
 				status_text = "Locked — finish the earlier quest first"
 		var label := Label.new()
+		# Long descriptions used to run off the panel's right edge;
+		# wrap them at the box width instead.
+		label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		label.size_flags_horizontal = Control.SIZE_FILL
 		label.text = "%s\n  %s — %s" % [data.quest_name, data.description, status_text]
 		quest_box.add_child(label)
