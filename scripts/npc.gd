@@ -17,15 +17,19 @@ var player_near: bool = false
 
 
 func _ready() -> void:
+	# Chibi standing frames (finalbossblues set, via chibi_sprites.gd).
+	# Frames are 32x64; offset -8 keeps the feet at the bottom of
+	# the 32x48 collision box.
+	sprite.offset = Vector2(0, -8)
 	if npc_type == "storage":
 		name_label.text = "Storage"
-		sprite.texture = SpriteData.get_texture("storage_keeper")
+		sprite.texture = ChibiSprites.frame_texture("storage_keeper_stand")
 	elif npc_type == "quest":
 		name_label.text = "Elder"
-		sprite.texture = SpriteData.get_texture("elder")
+		sprite.texture = ChibiSprites.frame_texture("elder_stand")
 	else:
 		name_label.text = "Shop"
-		sprite.texture = SpriteData.get_texture("shopkeeper")
+		sprite.texture = ChibiSprites.frame_texture("shopkeeper_stand")
 	prompt_label.visible = false
 	interact_area.body_entered.connect(_on_body_entered)
 	interact_area.body_exited.connect(_on_body_exited)

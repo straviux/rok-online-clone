@@ -73,7 +73,9 @@ var _click_stuck_timer: float = 0.0
 var _damage_number_scene: PackedScene = preload("res://scenes/ui/damage_number.tscn")
 var _fire_bolt_scene: PackedScene = preload("res://scenes/skills/fire_bolt.tscn")
 
-@onready var sprite: Sprite2D = $Sprite2D
+@onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
+
+var _facing: String = "down"
 
 
 func xp_to_next() -> int:
@@ -160,15 +162,34 @@ func _ready() -> void:
 	else:
 		hp = float(max_hp)
 		sp = float(max_sp)
-	# Pixel-art sprite, generated at runtime from scripts/sprite_data.gd
-	# (no image files, so the whole project stays pushable as text).
-	# The blue box below is only a last-resort fallback.
-	if sprite.texture == null:
-		sprite.texture = SpriteData.get_texture("player")
-	if sprite.texture == null:
+	# Chibi walk/idle animations from scripts/chibi_sprites.gd
+	# (finalbossblues chibi set, converted to code so the project
+	# stays pushable as text — no PNG files in the repo).
+	# Frames are 32x64; offset -8 keeps the feet at the bottom of
+	# the 28x44 collision box instead of floating below it.
+	sprite.offset = Vector2(0, -8)
+	var frames := SpriteFrames.new()
+	for direction in ["down", "left", "right", "up"]:
+		frames.add_animation("walk_" + direction)
+		frames.set_animation_loop("walk_" + direction, true)
+		frames.set_animation_speed("walk_" + direction, 8.0)
+		for frame_index in [0, 1, 2, 1]:
+			var tex: Texture2D = ChibiSprites.frame_texture("player_" + direction + "_" + str(frame_index))
+			if tex != null:
+				frames.add_frame("walk_" + direction, tex)
+		frames.add_animation("idle_" + direction)
+		frames.set_animation_loop("idle_" + direction, true)
+		var stand: Texture2D = ChibiSprites.frame_texture("player_" + direction + "_1")
+		if stand != null:
+			frames.add_frame("idle_" + direction, stand)
+	if frames.get_animation_names().is_empty():
+		# Last-resort fallback: a blue box so the player is never invisible.
 		var image := Image.create(32, 48, false, Image.FORMAT_RGBA8)
 		image.fill(Color(0.35, 0.65, 1.0))
-		sprite.texture = ImageTexture.create_from_image(image)
+		frames.add_animation("idle_down")
+		frames.add_frame("idle_down", ImageTexture.create_from_image(image))
+	sprite.sprite_frames = frames
+	sprite.play("idle_down")
 
 
 func set_target(new_target: Node) -> void:
@@ -414,12 +435,24 @@ func _physics_process(delta: float) -> void:
 	else:
 		_click_stuck_timer = 0.0
 
-	if velocity.x < 0.0:
-		sprite.flip_h = true
-	elif velocity.x > 0.0:
-		sprite.flip_h = false
+	_update_animation()
 
 	_attack_target(delta)
+
+
+func _update_animation() -> void:
+	if velocity.length() > 0.0:
+		if abs(velocity.x) >= abs(velocity.y):
+			_facing = "left" if velocity.x < 0.0 else "right"
+		else:
+			_facing = "up" if velocity.y < 0.0 else "down"
+		var walk_animation := "walk_" + _facing
+		if sprite.animation != walk_animation:
+			sprite.play(walk_animation)
+	else:
+		var idle_animation := "idle_" + _facing
+		if sprite.animation != idle_animation:
+			sprite.play(idle_animation)
 
 
 func _attack_target(delta: float) -> void:
