@@ -41,10 +41,15 @@ func _input(event: InputEvent) -> void:
 					if panel.visible:
 						panel.visible = false
 						return
-			# No panel open: Esc cancels an armed skill instead.
+			# No panel open: Esc cancels an armed skill or a cast chase.
 			var player_node: Node = get_tree().get_first_node_in_group("player")
-			if player_node != null and player_node.pending_skill != "":
-				player_node.pending_skill = ""
+			if player_node != null:
+				if player_node.pending_skill != "":
+					player_node.pending_skill = ""
+				if player_node.cast_chase_skill != "":
+					player_node.cast_chase_skill = ""
+					player_node.click_moving = false
+					player_node.click_chasing = false
 
 
 func _cooldown_text(timer: float) -> String:
@@ -74,7 +79,9 @@ func _process(_delta: float) -> void:
 		_cooldown_text(player.fire_bolt_timer),
 		GameManager.count_item("hp_potion") + GameManager.count_item("small_hp_potion"),
 	]
-	if player.pending_skill != "":
+	if player.cast_chase_skill != "":
+		skill_label.text += "  |  %s - moving into range" % player._skill_display_name(player.cast_chase_skill)
+	elif player.pending_skill != "":
 		skill_label.text += "  |  %s armed - click a monster" % player._skill_display_name(player.pending_skill)
 	if player.casting_skill != "":
 		cast_label.text = "Casting %s..." % player._skill_display_name(player.casting_skill)

@@ -22,6 +22,9 @@ extends CharacterBody2D
 ##   (Fire Bolt) arms the skill, and the next left-click on a monster
 ##   casts it on that monster. Clicking ground cancels the arming and
 ##   walks there; pressing the same key again or Esc also cancels.
+## - If the clicked monster is out of the skill's range, the player
+##   walks to the target until just inside max range, then casts
+##   automatically (Strike: attack_range, Bolt: 300).
 ##   Every skill has a cast time (Strike 0.5s, Bolt 0.8s, Heal 0.6s):
 ##   while casting the player stands still and a cast bar shows in
 ##   the HUD, then the effect lands. Taking damage does NOT interrupt.
@@ -78,6 +81,10 @@ var fire_bolt_timer: float = 0.0
 # Press-then-click targeting: pressing 1 or 3 arms that skill here;
 # the next left-click on a monster casts it. "" means nothing armed.
 var pending_skill: String = ""
+# Cast chase: an armed skill clicked on an out-of-range monster waits
+# here while the player walks into range, then casts on its own.
+# "" means no chase is running.
+var cast_chase_skill: String = ""
 # Casting: a started cast lands after cast_time_left reaches 0.
 # casting_skill "" means not casting; casting_target is null for Heal.
 var casting_skill: String = ""
@@ -235,6 +242,11 @@ func _input(event: InputEvent) -> void:
 			if casting_skill != "" and event.keycode in [KEY_1, KEY_2, KEY_3]:
 				# Already casting: skill keys wait, the cast bar shows why.
 				return
+			if cast_chase_skill != "" and event.keycode in [KEY_1, KEY_3]:
+				# Re-arming mid-chase drops the chase (and its walk).
+				cast_chase_skill = ""
+				click_moving = false
+				click_chasing = false
 			match event.keycode:
 				KEY_1:
 					_toggle_pending("power_strike")
@@ -265,22 +277,11 @@ func _target_at_mouse() -> void:
 	for result: Dictionary in results:
 		var collider: Object = result["collider"]
 		if collider is Node and collider.is_in_group("monsters"):
-			if pending_skill != "":
-				# Armed skill: this click IS the cast, not a chase.
-				var skill := pending_skill
-				pending_skill = ""
-				set_target(collider)
-				click_moving = false
-				click_chasing = false
-				_start_cast(skill, collider)
-			else:
-				set_target(collider)
-				click_chasing = true
-				click_moving = true
-				_click_stuck_timer = 0.0
+			_on_monster_clicked(collider)
 			return
-	# Ground click: cancels any arming, then walks there as usual.
+	# Ground click: cancels any arming or cast chase, then walks there.
 	pending_skill = ""
+	cast_chase_skill = ""
 	set_target(null)
 	click_chasing = false
 	click_destination = mouse_position
@@ -323,6 +324,40 @@ func _toggle_pending(skill: String) -> void:
 		pending_skill = skill
 
 
+func _skill_range(skill: String) -> float:
+	match skill:
+		"power_strike":
+			return attack_range
+		"fire_bolt":
+			return 300.0
+	return 0.0
+
+
+func _on_monster_clicked(monster: Node) -> void:
+	if pending_skill != "":
+		# Armed skill: this click casts, or starts a walk into range.
+		var skill := pending_skill
+		pending_skill = ""
+		set_target(monster)
+		if global_position.distance_to(monster.global_position) <= _skill_range(skill):
+			click_moving = false
+			click_chasing = false
+			_start_cast(skill, monster)
+		else:
+			cast_chase_skill = skill
+			click_chasing = true
+			click_moving = true
+			_click_stuck_timer = 0.0
+			_show_message("Moving into range", Color(1.0, 1.0, 1.0, 1.0))
+	else:
+		# Plain click: a new target replaces any old cast chase.
+		cast_chase_skill = ""
+		set_target(monster)
+		click_chasing = true
+		click_moving = true
+		_click_stuck_timer = 0.0
+
+
 func _start_cast(skill: String, cast_target: Node) -> bool:
 	# Checks first (nothing is spent on a failed cast), then SP and
 	# cooldown are spent and the cast bar starts ticking.
@@ -330,7 +365,7 @@ func _start_cast(skill: String, cast_target: Node) -> bool:
 		_show_message("No target", Color(1.0, 1.0, 1.0, 1.0))
 		return false
 	if skill == "power_strike":
-		if global_position.distance_to(cast_target.global_position) > attack_range:
+		if global_position.distance_to(cast_target.global_position) > _skill_range(skill):
 			_show_message("Out of range", Color(1.0, 1.0, 1.0, 1.0))
 			return false
 		if power_strike_timer > 0.0:
@@ -342,7 +377,7 @@ func _start_cast(skill: String, cast_target: Node) -> bool:
 		sp -= 5.0
 		power_strike_timer = 3.0
 	elif skill == "fire_bolt":
-		if global_position.distance_to(cast_target.global_position) > 300.0:
+		if global_position.distance_to(cast_target.global_position) > _skill_range(skill):
 			_show_message("Out of range", Color(1.0, 1.0, 1.0, 1.0))
 			return false
 		if fire_bolt_timer > 0.0:
@@ -505,6 +540,7 @@ func _physics_process(delta: float) -> void:
 		# WASD always wins and cancels click movement (target stays set).
 		click_moving = false
 		click_chasing = false
+		cast_chase_skill = ""
 		_click_stuck_timer = 0.0
 		velocity = direction.normalized() * speed
 	elif click_moving:
@@ -512,7 +548,16 @@ func _physics_process(delta: float) -> void:
 			if not _target_ready():
 				click_moving = false
 				click_chasing = false
+				cast_chase_skill = ""
 				velocity = Vector2.ZERO
+			elif cast_chase_skill != "" and global_position.distance_to(target.global_position) <= _skill_range(cast_chase_skill):
+				# Walked into max range: stop and cast, right here.
+				var skill := cast_chase_skill
+				cast_chase_skill = ""
+				click_moving = false
+				click_chasing = false
+				velocity = Vector2.ZERO
+				_start_cast(skill, target)
 			elif global_position.distance_to(target.global_position) <= attack_range:
 				# In range: stand still, _attack_target below does the work.
 				velocity = Vector2.ZERO
@@ -538,6 +583,7 @@ func _physics_process(delta: float) -> void:
 			if _click_stuck_timer > 0.5:
 				click_moving = false
 				click_chasing = false
+				cast_chase_skill = ""
 				_click_stuck_timer = 0.0
 		else:
 			_click_stuck_timer = 0.0
