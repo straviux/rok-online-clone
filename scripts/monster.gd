@@ -75,7 +75,14 @@ func _ready() -> void:
 	hp_bar.max_value = max_hp
 	hp_bar.value = hp
 	hp_bar.show_percentage = false
-	if sprite.texture == null:
+	if data != null and data.sprite_name != "":
+		sprite.texture = SpriteData.get_texture(data.sprite_name)
+		# Sprites are 32x32, but scale to fit anyway so a differently
+		# sized sprite never breaks the 32x32 collision box.
+		var tex_size: Vector2 = sprite.texture.get_size()
+		var fit: float = 32.0 / max(tex_size.x, tex_size.y)
+		sprite.scale = Vector2(fit, fit)
+	elif sprite.texture == null:
 		var image := Image.create(32, 32, false, Image.FORMAT_RGBA8)
 		if data != null:
 			image.fill(data.color)

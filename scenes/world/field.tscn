@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene load_steps=17 format=3]
 
 [ext_resource type="Script" path="res://scripts/world.gd" id="1_world"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
@@ -11,6 +11,7 @@
 [ext_resource type="Resource" path="res://data/wolf.tres" id="8_wolf"]
 [ext_resource type="PackedScene" path="res://scenes/ui/inventory_panel.tscn" id="10_inventory"]
 [ext_resource type="PackedScene" path="res://scenes/ui/quest_log_panel.tscn" id="11_quests"]
+[ext_resource type="Script" path="res://scripts/sprite_node.gd" id="15_sprite_node"]
 
 [sub_resource type="RectangleShape2D" id="Shape_tree"]
 size = Vector2(64, 64)
@@ -50,12 +51,9 @@ position = Vector2(-400, -300)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Tree1"]
 shape = SubResource("Shape_tree")
 
-[node name="ColorRect" type="ColorRect" parent="Tree1"]
-offset_left = -32.0
-offset_top = -32.0
-offset_right = 32.0
-offset_bottom = 32.0
-color = Color(0.2, 0.55, 0.25, 1)
+[node name="Sprite2D" type="Sprite2D" parent="Tree1"]
+script = ExtResource("15_sprite_node")
+sprite_name = "tree"
 
 [node name="Tree2" type="StaticBody2D" parent="."]
 position = Vector2(400, -300)
@@ -63,12 +61,9 @@ position = Vector2(400, -300)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Tree2"]
 shape = SubResource("Shape_tree")
 
-[node name="ColorRect" type="ColorRect" parent="Tree2"]
-offset_left = -32.0
-offset_top = -32.0
-offset_right = 32.0
-offset_bottom = 32.0
-color = Color(0.2, 0.55, 0.25, 1)
+[node name="Sprite2D" type="Sprite2D" parent="Tree2"]
+script = ExtResource("15_sprite_node")
+sprite_name = "tree"
 
 [node name="Tree3" type="StaticBody2D" parent="."]
 position = Vector2(-700, 0)
@@ -76,12 +71,9 @@ position = Vector2(-700, 0)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Tree3"]
 shape = SubResource("Shape_tree")
 
-[node name="ColorRect" type="ColorRect" parent="Tree3"]
-offset_left = -32.0
-offset_top = -32.0
-offset_right = 32.0
-offset_bottom = 32.0
-color = Color(0.2, 0.55, 0.25, 1)
+[node name="Sprite2D" type="Sprite2D" parent="Tree3"]
+script = ExtResource("15_sprite_node")
+sprite_name = "tree"
 
 [node name="Tree4" type="StaticBody2D" parent="."]
 position = Vector2(700, 0)
@@ -89,12 +81,9 @@ position = Vector2(700, 0)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Tree4"]
 shape = SubResource("Shape_tree")
 
-[node name="ColorRect" type="ColorRect" parent="Tree4"]
-offset_left = -32.0
-offset_top = -32.0
-offset_right = 32.0
-offset_bottom = 32.0
-color = Color(0.2, 0.55, 0.25, 1)
+[node name="Sprite2D" type="Sprite2D" parent="Tree4"]
+script = ExtResource("15_sprite_node")
+sprite_name = "tree"
 
 [node name="Tree5" type="StaticBody2D" parent="."]
 position = Vector2(0, -300)
@@ -102,12 +91,9 @@ position = Vector2(0, -300)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Tree5"]
 shape = SubResource("Shape_tree")
 
-[node name="ColorRect" type="ColorRect" parent="Tree5"]
-offset_left = -32.0
-offset_top = -32.0
-offset_right = 32.0
-offset_bottom = 32.0
-color = Color(0.2, 0.55, 0.25, 1)
+[node name="Sprite2D" type="Sprite2D" parent="Tree5"]
+script = ExtResource("15_sprite_node")
+sprite_name = "tree"
 
 [node name="Rock1" type="StaticBody2D" parent="."]
 position = Vector2(-250, 200)
@@ -115,12 +101,9 @@ position = Vector2(-250, 200)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Rock1"]
 shape = SubResource("Shape_rock")
 
-[node name="ColorRect" type="ColorRect" parent="Rock1"]
-offset_left = -24.0
-offset_top = -24.0
-offset_right = 24.0
-offset_bottom = 24.0
-color = Color(0.55, 0.55, 0.55, 1)
+[node name="Sprite2D" type="Sprite2D" parent="Rock1"]
+script = ExtResource("15_sprite_node")
+sprite_name = "rock"
 
 [node name="Rock2" type="StaticBody2D" parent="."]
 position = Vector2(250, -100)
@@ -128,12 +111,9 @@ position = Vector2(250, -100)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Rock2"]
 shape = SubResource("Shape_rock")
 
-[node name="ColorRect" type="ColorRect" parent="Rock2"]
-offset_left = -24.0
-offset_top = -24.0
-offset_right = 24.0
-offset_bottom = 24.0
-color = Color(0.55, 0.55, 0.55, 1)
+[node name="Sprite2D" type="Sprite2D" parent="Rock2"]
+script = ExtResource("15_sprite_node")
+sprite_name = "rock"
 
 [node name="WallTop" type="StaticBody2D" parent="."]
 position = Vector2(0, -625)

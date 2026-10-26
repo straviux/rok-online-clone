@@ -10,7 +10,7 @@ extends Node2D
 
 var player_near: bool = false
 
-@onready var color_rect: ColorRect = $Body/ColorRect
+@onready var sprite: Sprite2D = $Body/Sprite2D
 @onready var name_label: Label = $NameLabel
 @onready var prompt_label: Label = $PromptLabel
 @onready var interact_area: Area2D = $InteractArea
@@ -19,13 +19,13 @@ var player_near: bool = false
 func _ready() -> void:
 	if npc_type == "storage":
 		name_label.text = "Storage"
-		color_rect.color = Color(0.2, 0.8, 0.9, 1)
+		sprite.texture = SpriteData.get_texture("storage_keeper")
 	elif npc_type == "quest":
 		name_label.text = "Elder"
-		color_rect.color = Color(1.0, 0.85, 0.2, 1)
+		sprite.texture = SpriteData.get_texture("elder")
 	else:
 		name_label.text = "Shop"
-		color_rect.color = Color(0.6, 0.3, 0.9, 1)
+		sprite.texture = SpriteData.get_texture("shopkeeper")
 	prompt_label.visible = false
 	interact_area.body_entered.connect(_on_body_entered)
 	interact_area.body_exited.connect(_on_body_exited)

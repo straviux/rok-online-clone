@@ -19,3 +19,4 @@ gold_drop = 10
 respawn_time = 10.0
 drop_item_id = "small_hp_potion"
 drop_chance = 0.2
+sprite_name = "skeleton"

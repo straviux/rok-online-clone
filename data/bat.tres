@@ -19,3 +19,4 @@ gold_drop = 5
 respawn_time = 6.0
 drop_item_id = "sp_potion"
 drop_chance = 0.2
+sprite_name = "bat"

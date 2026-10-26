@@ -22,3 +22,4 @@ drop_chance = 0.5
 special_damage = 15
 special_cooldown = 5.0
 special_range = 150.0
+sprite_name = "boss"

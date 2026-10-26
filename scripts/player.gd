@@ -160,8 +160,11 @@ func _ready() -> void:
 	else:
 		hp = float(max_hp)
 		sp = float(max_sp)
-	# Placeholder art: a plain coloured box until real sprites arrive.
-	# Only generated when no texture has been assigned in the editor.
+	# Pixel-art sprite, generated at runtime from scripts/sprite_data.gd
+	# (no image files, so the whole project stays pushable as text).
+	# The blue box below is only a last-resort fallback.
+	if sprite.texture == null:
+		sprite.texture = SpriteData.get_texture("player")
 	if sprite.texture == null:
 		var image := Image.create(32, 48, false, Image.FORMAT_RGBA8)
 		image.fill(Color(0.35, 0.65, 1.0))

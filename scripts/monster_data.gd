@@ -16,6 +16,10 @@ extends Resource
 @export var attack_cooldown: float = 1.0
 @export var leash_range: float = 400.0
 @export var color: Color = Color(0.3, 0.9, 0.4, 1)
+# Pixel-art sprite name in scripts/sprite_data.gd (runtime-generated,
+# no image files). If empty, monster.gd falls back to a coloured box
+# using color, as in Phases 2-5.
+@export var sprite_name: String = ""
 @export var gold_drop: int = 3
 @export var respawn_time: float = 5.0
 # Phase 4 loot: one possible item drop, rolled on death.

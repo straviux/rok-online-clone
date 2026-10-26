@@ -21,3 +21,4 @@ drop_item_id = "sp_potion"
 drop_chance = 0.2
 drop_item_id2 = "herb"
 drop_chance2 = 0.5
+sprite_name = "mushroom"

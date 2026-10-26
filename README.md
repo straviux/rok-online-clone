@@ -107,12 +107,26 @@ data/
    then clears the flag. Starting a scene directly from the editor still
    uses that scene's default Player position.
 
-## Placeholder art, on purpose
+## Pixel-art sprites
 
-Everything visual in Phase 1 is coloured boxes: the player sprite is
-generated in `player.gd` at runtime, and houses/trees/rocks/portals are
-`ColorRect` boxes with matching collision shapes. Replace a box with a
-real sprite later without changing the collision or movement code.
+Placeholder boxes are gone for characters and world objects. Sprites
+are generated at runtime from pixel grids in `scripts/sprite_data.gd`
+— deliberately no image files, so the whole project stays plain text
+and pushable (the GitHub snapshot tool rejects binary PNGs). Grids
+are upscaled with nearest-neighbour so pixels stay crisp, and `.`
+in a grid is transparent:
+- Player (32x48), shopkeeper, storage keeper, and Elder (32x48)
+- Monsters (32x32): slime, mushroom, wolf, skeleton, bat, goblin,
+  Dungeon Guardian — wired through `MonsterData.sprite_name`, with
+  the old coloured-box fallback if a sprite name is missing
+- Houses (220x160), trees (64x64), rocks (48x48) in town and field,
+  via `scripts/sprite_node.gd` (a Sprite2D that draws by name)
+- Still flat colour by design: ground, walls, dungeon pillars, and
+  the glowing portals (a portal is a glow, not an object)
+
+To change a sprite, edit its grid in `scripts/sprite_data.gd` —
+nothing else needs to change. Collision shapes are unchanged, so
+movement, targeting, and combat work exactly as before.
 
 ## Known Phase 1 simplifications
 
