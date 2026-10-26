@@ -1,16 +1,28 @@
 extends CanvasLayer
-## Phase 2 HUD: player HP, gold, and the current target's HP.
+## Phase 3 HUD: player HP/SP/XP, level, gold, target HP, and skill status.
 ## The target bars hide when nothing is targeted (town, or no monster).
 
 @onready var hp_bar: ProgressBar = $HPBar
+@onready var sp_bar: ProgressBar = $SPBar
+@onready var xp_bar: ProgressBar = $XPBar
+@onready var level_label: Label = $LevelLabel
 @onready var gold_label: Label = $GoldLabel
 @onready var target_label: Label = $TargetLabel
 @onready var target_bar: ProgressBar = $TargetBar
+@onready var skill_label: Label = $SkillLabel
 
 
 func _ready() -> void:
 	hp_bar.show_percentage = false
+	sp_bar.show_percentage = false
+	xp_bar.show_percentage = false
 	target_bar.show_percentage = false
+
+
+func _cooldown_text(timer: float) -> String:
+	if timer <= 0.0:
+		return "ready"
+	return "%.1fs" % timer
 
 
 func _process(_delta: float) -> void:
@@ -19,7 +31,21 @@ func _process(_delta: float) -> void:
 		return
 	hp_bar.max_value = player.max_hp
 	hp_bar.value = player.hp
+	sp_bar.max_value = player.max_sp
+	sp_bar.value = player.sp
+	xp_bar.max_value = player.xp_to_next()
+	xp_bar.value = player.xp
+	if player.stat_points > 0:
+		level_label.text = "Lv %d (%d pts)" % [player.level, player.stat_points]
+	else:
+		level_label.text = "Lv %d" % player.level
 	gold_label.text = "Gold: %d" % GameManager.gold
+	skill_label.text = "1 Power Strike [%s]  2 Heal [%s]  3 Fire Bolt [%s]  4 HP Potion x%d  |  C Stats" % [
+		_cooldown_text(player.power_strike_timer),
+		_cooldown_text(player.heal_timer),
+		_cooldown_text(player.fire_bolt_timer),
+		player.potions,
+	]
 
 	var target: Node = player.target
 	if target != null and is_instance_valid(target) and not target.dead:

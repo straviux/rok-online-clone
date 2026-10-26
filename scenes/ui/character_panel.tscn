@@ -1,0 +1,146 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/character_panel.gd" id="1_panel"]
+
+[node name="CharacterPanel" type="CanvasLayer"]
+script = ExtResource("1_panel")
+
+[node name="Panel" type="ColorRect" parent="."]
+offset_left = 326.0
+offset_top = 124.0
+offset_right = 826.0
+offset_bottom = 584.0
+color = Color(0.1, 0.1, 0.15, 0.95)
+
+[node name="TitleLabel" type="Label" parent="Panel"]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 468.0
+offset_bottom = 44.0
+text = "Character (press C to close)"
+
+[node name="LevelLabel" type="Label" parent="Panel"]
+offset_left = 16.0
+offset_top = 56.0
+offset_right = 380.0
+offset_bottom = 84.0
+text = "Level: 1"
+
+[node name="XPLabel" type="Label" parent="Panel"]
+offset_left = 16.0
+offset_top = 88.0
+offset_right = 380.0
+offset_bottom = 116.0
+text = "XP: 0 / 25"
+
+[node name="HPLabel" type="Label" parent="Panel"]
+offset_left = 16.0
+offset_top = 120.0
+offset_right = 380.0
+offset_bottom = 148.0
+text = "HP: 0 / 0"
+
+[node name="SPLabel" type="Label" parent="Panel"]
+offset_left = 16.0
+offset_top = 152.0
+offset_right = 380.0
+offset_bottom = 180.0
+text = "SP: 0 / 0"
+
+[node name="PointsLabel" type="Label" parent="Panel"]
+offset_left = 16.0
+offset_top = 184.0
+offset_right = 380.0
+offset_bottom = 212.0
+text = "Stat points: 0"
+
+[node name="STRLabel" type="Label" parent="Panel"]
+offset_left = 16.0
+offset_top = 216.0
+offset_right = 380.0
+offset_bottom = 244.0
+text = "STR: 5"
+
+[node name="STRButton" type="Button" parent="Panel"]
+offset_left = 400.0
+offset_top = 216.0
+offset_right = 460.0
+offset_bottom = 244.0
+text = "+"
+
+[node name="AGILabel" type="Label" parent="Panel"]
+offset_left = 16.0
+offset_top = 248.0
+offset_right = 380.0
+offset_bottom = 276.0
+text = "AGI: 5"
+
+[node name="AGIButton" type="Button" parent="Panel"]
+offset_left = 400.0
+offset_top = 248.0
+offset_right = 460.0
+offset_bottom = 276.0
+text = "+"
+
+[node name="VITLabel" type="Label" parent="Panel"]
+offset_left = 16.0
+offset_top = 280.0
+offset_right = 380.0
+offset_bottom = 308.0
+text = "VIT: 5"
+
+[node name="VITButton" type="Button" parent="Panel"]
+offset_left = 400.0
+offset_top = 280.0
+offset_right = 460.0
+offset_bottom = 308.0
+text = "+"
+
+[node name="INTLabel" type="Label" parent="Panel"]
+offset_left = 16.0
+offset_top = 312.0
+offset_right = 380.0
+offset_bottom = 340.0
+text = "INT: 5"
+
+[node name="INTButton" type="Button" parent="Panel"]
+offset_left = 400.0
+offset_top = 312.0
+offset_right = 460.0
+offset_bottom = 340.0
+text = "+"
+
+[node name="DEXLabel" type="Label" parent="Panel"]
+offset_left = 16.0
+offset_top = 344.0
+offset_right = 380.0
+offset_bottom = 372.0
+text = "DEX: 5"
+
+[node name="DEXButton" type="Button" parent="Panel"]
+offset_left = 400.0
+offset_top = 344.0
+offset_right = 460.0
+offset_bottom = 372.0
+text = "+"
+
+[node name="LUKLabel" type="Label" parent="Panel"]
+offset_left = 16.0
+offset_top = 376.0
+offset_right = 380.0
+offset_bottom = 404.0
+text = "LUK: 5"
+
+[node name="LUKButton" type="Button" parent="Panel"]
+offset_left = 400.0
+offset_top = 376.0
+offset_right = 460.0
+offset_bottom = 404.0
+text = "+"
+
+[node name="DerivedLabel" type="Label" parent="Panel"]
+offset_left = 16.0
+offset_top = 408.0
+offset_right = 468.0
+offset_bottom = 436.0
+text = ""

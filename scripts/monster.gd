@@ -19,6 +19,7 @@ var attack_cooldown: float = 1.0
 var leash_range: float = 400.0
 var gold_drop: int = 3
 var respawn_time: float = 5.0
+var xp: int = 10
 
 var dead: bool = false
 var returning: bool = false
@@ -50,6 +51,7 @@ func _ready() -> void:
 		leash_range = data.leash_range
 		gold_drop = data.gold_drop
 		respawn_time = data.respawn_time
+		xp = data.xp
 	hp = max_hp
 	hp_bar.max_value = max_hp
 	hp_bar.value = hp
@@ -85,6 +87,10 @@ func _die() -> void:
 	collision_shape.disabled = true
 	target_marker.visible = false
 	_respawn_timer = respawn_time
+	# Phase 3: the player who killed it earns its XP.
+	var player: Node = get_tree().get_first_node_in_group("player")
+	if player != null and player.has_method("gain_xp"):
+		player.gain_xp(xp)
 	var pickup: Node2D = _gold_pickup_scene.instantiate()
 	pickup.amount = gold_drop
 	pickup.position = global_position + Vector2(randf_range(-12.0, 12.0), 0.0)

@@ -1,9 +1,10 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://scripts/world.gd" id="1_world"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
 [ext_resource type="Script" path="res://scripts/portal.gd" id="3_portal"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="4_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/character_panel.tscn" id="5_panel"]
 
 [sub_resource type="RectangleShape2D" id="Shape_house"]
 size = Vector2(220, 160)
@@ -29,6 +30,8 @@ offset_bottom = 450.0
 color = Color(0.82, 0.78, 0.65, 1)
 
 [node name="HUD" parent="." instance=ExtResource("4_hud")]
+
+[node name="CharacterPanel" parent="." instance=ExtResource("5_panel")]
 
 [node name="Player" parent="." instance=ExtResource("2_player")]
 position = Vector2(0, 300)

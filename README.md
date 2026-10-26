@@ -1,9 +1,9 @@
-# Ragnarok-like Game — Phase 1 + Phase 2
+# Ragnarok-like Game — Phase 1 + Phase 2 + Phase 3
 
 A playable Godot 4 starting point: walk around, collide with the world,
-travel between town and field, and fight monsters in the field.
-No XP/levels, skills, inventory, shops, quests, or dungeon yet —
-those are later phases.
+travel between town and field, fight monsters, gain XP and levels,
+spend stat points, and cast skills.
+No inventory, shops, quests, or dungeon yet — those are later phases.
 
 ## How to run it (Windows)
 
@@ -20,7 +20,13 @@ You should spawn in town as a blue box character.
 - **Left-click a monster** — target it (yellow marker, target HP bar in HUD)
 - **Left-click empty ground** — clear the target
 - Walk close to a targeted monster and you attack automatically
-  (10 damage, every 0.8 seconds, range 80). There is no click-to-move yet.
+  (damage and range grow with STR/DEX; see Phase 3 below).
+  There is no click-to-move yet.
+- **1 Power Strike** (5 SP, 3s cooldown, x1.8 damage, needs a target in range)
+- **2 Heal** (10 SP, 5s cooldown, restores HP)
+- **3 Fire Bolt** (8 SP, 4s cooldown, 300 range, tracking projectile)
+- **4 HP Potion** (+30 HP, you start with 3; no shop yet, so use them wisely)
+- **C** — character panel: spend stat points with the + buttons
 - Walk into the glowing blue portal at the top of town to go to the field
 - Walk into the glowing portal at the bottom of the field to return to town
 
@@ -44,7 +50,7 @@ town at full HP (gold kept for now).
   Wolf 8s.
 - Field monsters: 2 Slimes (30 HP, 5 damage, slow), 2 Mushrooms
   (20 HP, 4 damage, fast), 1 Wolf (60 HP, 12 damage, aggressive).
-  XP is in the data files but not used yet — levels come in Phase 3.
+  XP is now used: killing a monster awards its XP (see Phase 3).
 
 ## What is in here
 
@@ -101,8 +107,26 @@ real sprite later without changing the collision or movement code.
   not run inside the Godot editor. If Godot reports an error on import,
   paste the exact error and it can be fixed from there.
 
-## Next: Phase 3 (progression)
+## Phase 3: progression
 
-XP from kills, level-ups, stat points (STR/AGI/VIT/INT/DEX/LUK),
-HP/SP regen, potions, and the four skills: Basic Attack, Power Strike,
-Heal, and Fire Bolt.
+- XP from kills. XP to next level = 25 x level (25 to reach level 2).
+  On level-up you get 5 stat points and a "Level Up!" message.
+- Base stats all start at 5. Press C and use the + buttons to spend points.
+- Formulas (all in `player.gd`, in `recalculate_derived()`):
+  - max HP = 100 + VIT x 10 + (level-1) x 10
+  - max SP = 50 + INT x 8 + (level-1) x 5
+  - attack damage = 10 + STR x 2, attack range = 80 + DEX x 2
+  - auto-attack cooldown = max(0.4, 0.8 - AGI x 0.02) seconds
+  - crit chance = 5% + LUK x 1% (basic attacks only, damage x2)
+  - HP regen = 2 + VIT x 0.5 per second, SP regen = 1.5 + INT x 0.4
+  - Heal = 20 + INT x 3, Fire Bolt = 15 + INT x 3
+- Regen is x3 in town, so standing in town is the safe way to recover.
+  If a monster kills you, you respawn in town at full HP/SP.
+- HUD now shows HP, SP, and XP bars, level (with unspent points),
+  gold, skill cooldowns, and potion count.
+- Potions are not restocked yet — shops and inventory come in Phase 4.
+
+## Next: Phase 4 (items and economy)
+
+Inventory, equipment slots, shop and storage NPCs, loot tables, and
+spending gold — reusing the gold and drops already in the game.
