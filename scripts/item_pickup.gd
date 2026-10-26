@@ -21,6 +21,9 @@ func _on_body_entered(body: Node2D) -> void:
 		return
 	if item != null:
 		GameManager.add_item(item, 1)
+		# Phase 5: collect quests count pickups, not inventory totals,
+		# so herbs found before accepting the quest do not count.
+		GameManager.notify_item_collected(item.item_id)
 		var number: Node = _damage_number_scene.instantiate()
 		number.position = body.global_position + Vector2(0.0, -50.0)
 		get_tree().current_scene.add_child(number)

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="QuestData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/quest_data.gd" id="1_quest"]
+
+[resource]
+script = ExtResource("1_quest")
+quest_id = "dungeon_boss"
+quest_name = "Clear the Dungeon"
+description = "Enter the dungeon through the portal in the field and defeat the Dungeon Guardian. Bring potions."
+objective_type = "boss"
+target_id = "boss"
+target_label = "Dungeon Guardian"
+amount = 1
+reward_xp = 200
+reward_gold = 150
+reward_item_id = "iron_sword"

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="QuestData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/quest_data.gd" id="1_quest"]
+
+[resource]
+script = ExtResource("1_quest")
+quest_id = "wolf_hunt"
+quest_name = "Wolf Hunt"
+description = "A wolf stalks the field. Defeat 5 wolves — it respawns, so keep at it."
+objective_type = "kill"
+target_id = "wolf"
+target_label = "Wolves"
+amount = 5
+reward_xp = 100
+reward_gold = 60

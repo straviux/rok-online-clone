@@ -1,0 +1,33 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/quest_log_panel.gd" id="1_panel"]
+
+[node name="QuestLogPanel" type="CanvasLayer"]
+script = ExtResource("1_panel")
+
+[node name="Panel" type="ColorRect" parent="."]
+offset_left = 226.0
+offset_top = 54.0
+offset_right = 926.0
+offset_bottom = 614.0
+color = Color(0.1, 0.1, 0.15, 0.95)
+
+[node name="TitleLabel" type="Label" parent="Panel"]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 580.0
+offset_bottom = 44.0
+text = "Quest Log (press Q to close)"
+
+[node name="CloseButton" type="Button" parent="Panel"]
+offset_left = 600.0
+offset_top = 16.0
+offset_right = 684.0
+offset_bottom = 44.0
+text = "Close"
+
+[node name="QuestBox" type="VBoxContainer" parent="Panel"]
+offset_left = 16.0
+offset_top = 56.0
+offset_right = 684.0
+offset_bottom = 544.0

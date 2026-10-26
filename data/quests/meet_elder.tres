@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="QuestData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/quest_data.gd" id="1_quest"]
+
+[resource]
+script = ExtResource("1_quest")
+quest_id = "meet_elder"
+quest_name = "Meet the Elder"
+description = "The Elder in town wants to speak with you. Press E near him to talk."
+objective_type = "talk"
+target_id = "elder"
+target_label = "Talk to the Elder"
+amount = 1
+reward_xp = 20
+reward_gold = 20

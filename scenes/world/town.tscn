@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=17 format=3]
 
 [ext_resource type="Script" path="res://scripts/world.gd" id="1_world"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
@@ -9,6 +9,8 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/inventory_panel.tscn" id="7_inventory"]
 [ext_resource type="PackedScene" path="res://scenes/ui/shop_panel.tscn" id="8_shop"]
 [ext_resource type="PackedScene" path="res://scenes/ui/storage_panel.tscn" id="9_storage"]
+[ext_resource type="PackedScene" path="res://scenes/ui/dialogue_panel.tscn" id="10_dialogue"]
+[ext_resource type="PackedScene" path="res://scenes/ui/quest_log_panel.tscn" id="11_quests"]
 
 [sub_resource type="RectangleShape2D" id="Shape_house"]
 size = Vector2(220, 160)
@@ -43,6 +45,10 @@ color = Color(0.82, 0.78, 0.65, 1)
 
 [node name="StoragePanel" parent="." instance=ExtResource("9_storage")]
 
+[node name="DialoguePanel" parent="." instance=ExtResource("10_dialogue")]
+
+[node name="QuestLogPanel" parent="." instance=ExtResource("11_quests")]
+
 [node name="Shopkeeper" parent="." instance=ExtResource("6_npc")]
 position = Vector2(-250, -100)
 npc_type = "shop"
@@ -50,6 +56,10 @@ npc_type = "shop"
 [node name="StorageKeeper" parent="." instance=ExtResource("6_npc")]
 position = Vector2(250, -100)
 npc_type = "storage"
+
+[node name="Elder" parent="." instance=ExtResource("6_npc")]
+position = Vector2(0, -250)
+npc_type = "quest"
 
 [node name="Player" parent="." instance=ExtResource("2_player")]
 position = Vector2(0, 300)

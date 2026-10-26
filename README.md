@@ -1,9 +1,10 @@
-# Ragnarok-like Game — Phase 1 + Phase 2 + Phase 3 + Phase 4
+# Ragnarok-like Game — Phase 1 + Phase 2 + Phase 3 + Phase 4 + Phase 5
 
 A playable Godot 4 starting point: walk around, collide with the world,
 travel between town and field, fight monsters, gain XP and levels,
-spend stat points, cast skills, collect loot, equip gear, and spend
-gold at the shop. No quests or dungeon yet — those are later phases.
+spend stat points, cast skills, collect loot, equip gear, spend
+gold at the shop, take quests from the Elder, and clear the dungeon
+boss. Save/load, title screen, and pause menu are Phase 6.
 
 ## How to run it (Windows)
 
@@ -38,6 +39,13 @@ You should spawn in town as a blue box character.
   twice to confirm), sell your items for half price, or Esc/Close to leave
 - **E near the cyan Storage Keeper in town** — storage: Deposit items
   from your inventory, Withdraw them back, or Esc/Close to leave
+- **E near the gold Elder in town** — dialogue: accept the next quest
+  in the chain, or read your progress on the current one
+- **Q** — quest log: every quest in the chain, with its state and
+  progress (for example, "Slimes: 3/5")
+- Walk into the purple portal on the right side of the field to enter
+  the dungeon; walk into the purple portal at the bottom of the dungeon
+  to return to the field
 - Walk into the glowing blue portal at the top of town to go to the field
 - Walk into the glowing portal at the bottom of the field to return to town
 
@@ -158,7 +166,31 @@ real sprite later without changing the collision or movement code.
 - Key 4 now uses potions from your inventory instead of a separate count,
   and the HUD potion count is the HP potions you actually carry.
 
-## Next: Phase 5 (quests and dungeon)
+## Phase 5: quests and dungeon
 
-Quests and dialogue, the dungeon with a boss, and quest rewards — reusing
-the inventory, shop, and combat systems already in the game.
+- Quests are a chain, given by the Elder in town, one at a time:
+  1. Meet the Elder (talk) — 20 XP, 20 gold
+  2. Slime Hunt (kill 5 slimes) — 50 XP, 30 gold
+  3. Herb Gathering (collect 3 herbs; mushrooms drop herbs 50% of
+     the time, on top of their potion drop) — 60 XP, 40 gold
+  4. Wolf Hunt (kill 5 wolves) — 100 XP, 60 gold
+  5. Clear the Dungeon (defeat the Dungeon Guardian) — 200 XP,
+     150 gold, and an Iron Sword
+- Quest progress is tracked as it happens (kills on monster death,
+  pickups on item collection, not inventory totals), and completing a
+  quest shows a "Quest complete" message, grants its rewards at once,
+  and unlocks the next quest. Quest data lives in `data/quests/*.tres`.
+- The deliver example from the plan is not a separate quest: herb
+  gathering already ends with returning to the Elder for the next quest.
+- Dungeon (dark room, 1200x700, pillars, exit portal at the bottom):
+  2 Skeletons (80 HP, 15 damage), 2 Bats (35 HP, fast), 1 Goblin
+  (120 HP, 20 damage), and the Dungeon Guardian boss at the far end
+  (300 HP, 25 damage, 200 XP, 100 gold, 50% Silver Ring drop).
+  Boss special: every 5 seconds, a "Roar!" hits the player for 15
+  damage (before defence) if they are within 150 pixels — step back
+  to avoid it. The boss respawns after 30 seconds, like other monsters.
+
+## Next: Phase 6 (polish and save)
+
+Title screen, pause menu, save/load, sound placeholders, and a
+balance pass — reusing everything built so far.

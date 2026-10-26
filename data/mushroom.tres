@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_data")
+monster_id = "mushroom"
 monster_name = "Mushroom"
 max_hp = 20
 attack_damage = 4
@@ -18,3 +19,5 @@ gold_drop = 2
 respawn_time = 5.0
 drop_item_id = "sp_potion"
 drop_chance = 0.2
+drop_item_id2 = "herb"
+drop_chance2 = 0.5

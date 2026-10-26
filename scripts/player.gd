@@ -188,7 +188,7 @@ func _input(event: InputEvent) -> void:
 
 func _target_at_mouse() -> void:
 	# Clicking buttons on any open panel must not retarget/move.
-	for group_name: String in ["character_panel", "inventory_panel", "shop_panel", "storage_panel"]:
+	for group_name: String in ["character_panel", "inventory_panel", "shop_panel", "storage_panel", "dialogue_panel", "quest_log_panel"]:
 		for panel: Node in get_tree().get_nodes_in_group(group_name):
 			if panel.visible:
 				return

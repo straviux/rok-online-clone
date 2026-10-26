@@ -62,4 +62,4 @@ offset_left = 16.0
 offset_top = 610.0
 offset_right = 1100.0
 offset_bottom = 640.0
-text = "WASD/arrows or left-click to move. Left-click a monster to walk to it and attack. 1 Power Strike, 2 Heal, 3 Fire Bolt, 4 Potion, C Stats, I Inventory, E near NPCs, Esc close front panel."
+text = "WASD/click to move. Click monster to attack. 1 Strike, 2 Heal, 3 Bolt, 4 Potion. C Stats, I Inventory, Q Quests, E NPCs, Esc close front."

@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/monster_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+monster_id = "bat"
+monster_name = "Bat"
+max_hp = 35
+attack_damage = 8
+speed = 150.0
+xp = 20
+aggro_range = 140.0
+attack_range = 45.0
+attack_cooldown = 0.8
+leash_range = 400.0
+color = Color(0.4, 0.3, 0.6, 1)
+gold_drop = 5
+respawn_time = 6.0
+drop_item_id = "sp_potion"
+drop_chance = 0.2

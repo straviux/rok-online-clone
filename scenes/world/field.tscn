@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=16 format=3]
 
 [ext_resource type="Script" path="res://scripts/world.gd" id="1_world"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
@@ -10,6 +10,7 @@
 [ext_resource type="Resource" path="res://data/mushroom.tres" id="7_mushroom"]
 [ext_resource type="Resource" path="res://data/wolf.tres" id="8_wolf"]
 [ext_resource type="PackedScene" path="res://scenes/ui/inventory_panel.tscn" id="10_inventory"]
+[ext_resource type="PackedScene" path="res://scenes/ui/quest_log_panel.tscn" id="11_quests"]
 
 [sub_resource type="RectangleShape2D" id="Shape_tree"]
 size = Vector2(64, 64)
@@ -37,6 +38,8 @@ color = Color(0.35, 0.65, 0.35, 1)
 [node name="CharacterPanel" parent="." instance=ExtResource("9_panel")]
 
 [node name="InventoryPanel" parent="." instance=ExtResource("10_inventory")]
+
+[node name="QuestLogPanel" parent="." instance=ExtResource("11_quests")]
 
 [node name="Player" parent="." instance=ExtResource("2_player")]
 position = Vector2(0, 470)
@@ -171,6 +174,22 @@ offset_top = -40.0
 offset_right = 60.0
 offset_bottom = 40.0
 color = Color(0.2, 0.85, 1, 0.6)
+
+[node name="PortalToDungeon" type="Area2D" parent="."]
+position = Vector2(750, 250)
+script = ExtResource("3_portal")
+target_scene_path = "res://scenes/world/dungeon.tscn"
+spawn_position = Vector2(0, 200)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PortalToDungeon"]
+shape = SubResource("Shape_portal")
+
+[node name="ColorRect" type="ColorRect" parent="PortalToDungeon"]
+offset_left = -60.0
+offset_top = -40.0
+offset_right = 60.0
+offset_bottom = 40.0
+color = Color(0.6, 0.2, 0.9, 0.6)
 
 [node name="Slime1" parent="." instance=ExtResource("5_monster")]
 position = Vector2(-200, -200)

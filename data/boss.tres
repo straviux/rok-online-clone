@@ -1,0 +1,24 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/monster_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+monster_id = "boss"
+monster_name = "Dungeon Guardian"
+max_hp = 300
+attack_damage = 25
+speed = 70.0
+xp = 200
+aggro_range = 200.0
+attack_range = 50.0
+attack_cooldown = 1.0
+leash_range = 400.0
+color = Color(0.8, 0.2, 0.2, 1)
+gold_drop = 100
+respawn_time = 30.0
+drop_item_id = "silver_ring"
+drop_chance = 0.5
+special_damage = 15
+special_cooldown = 5.0
+special_range = 150.0

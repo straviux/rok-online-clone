@@ -22,6 +22,12 @@ var respawn_time: float = 5.0
 var xp: int = 10
 var drop_item_id: String = ""
 var drop_chance: float = 0.0
+var drop_item_id2: String = ""
+var drop_chance2: float = 0.0
+var monster_id: String = ""
+var special_damage: int = 0
+var special_cooldown: float = 0.0
+var special_range: float = 0.0
 
 var dead: bool = false
 var returning: bool = false
@@ -29,6 +35,7 @@ var returning: bool = false
 var _spawn_position: Vector2 = Vector2.ZERO
 var _attack_timer: float = 0.0
 var _respawn_timer: float = 0.0
+var _special_timer: float = 0.0
 var _flash_timer: float = 0.0
 
 var _damage_number_scene: PackedScene = preload("res://scenes/ui/damage_number.tscn")
@@ -57,6 +64,13 @@ func _ready() -> void:
 		xp = data.xp
 		drop_item_id = data.drop_item_id
 		drop_chance = data.drop_chance
+		drop_item_id2 = data.drop_item_id2
+		drop_chance2 = data.drop_chance2
+		monster_id = data.monster_id
+		special_damage = data.special_damage
+		special_cooldown = data.special_cooldown
+		special_range = data.special_range
+		_special_timer = special_cooldown
 	hp = max_hp
 	hp_bar.max_value = max_hp
 	hp_bar.value = hp
@@ -93,21 +107,30 @@ func _die() -> void:
 	target_marker.visible = false
 	_respawn_timer = respawn_time
 	# Phase 3: the player who killed it earns its XP.
+	# Phase 5: quest kill/boss progress is reported the same way.
 	var player: Node = get_tree().get_first_node_in_group("player")
 	if player != null and player.has_method("gain_xp"):
 		player.gain_xp(xp)
+	GameManager.notify_kill(monster_id)
 	var pickup: Node2D = _gold_pickup_scene.instantiate()
 	pickup.amount = gold_drop
 	pickup.position = global_position + Vector2(randf_range(-12.0, 12.0), 0.0)
 	get_tree().current_scene.add_child(pickup)
-	# Phase 4 loot roll: one possible item, at its drop chance.
-	if drop_item_id != "" and randf() < drop_chance:
-		var loot_item: ItemData = _load_item(drop_item_id)
-		if loot_item != null:
-			var item_pickup: Node2D = _item_pickup_scene.instantiate()
-			item_pickup.item = loot_item
-			item_pickup.position = global_position + Vector2(randf_range(-20.0, 20.0), randf_range(-10.0, 10.0))
-			get_tree().current_scene.add_child(item_pickup)
+	# Phase 4 loot rolls, one per drop slot (Phase 5 adds a second
+	# slot, so mushrooms can drop both a potion and a herb).
+	_try_drop(drop_item_id, drop_chance)
+	_try_drop(drop_item_id2, drop_chance2)
+
+
+func _try_drop(item_id: String, chance: float) -> void:
+	if item_id == "" or randf() >= chance:
+		return
+	var loot_item: ItemData = _load_item(item_id)
+	if loot_item != null:
+		var item_pickup: Node2D = _item_pickup_scene.instantiate()
+		item_pickup.item = loot_item
+		item_pickup.position = global_position + Vector2(randf_range(-20.0, 20.0), randf_range(-10.0, 10.0))
+		get_tree().current_scene.add_child(item_pickup)
 
 
 func _load_item(item_id: String) -> ItemData:
@@ -118,6 +141,12 @@ func _load_item(item_id: String) -> ItemData:
 			return preload("res://data/items/sp_potion.tres")
 		"wooden_ring":
 			return preload("res://data/items/wooden_ring.tres")
+		"herb":
+			return preload("res://data/items/herb.tres")
+		"hp_potion":
+			return preload("res://data/items/hp_potion.tres")
+		"silver_ring":
+			return preload("res://data/items/silver_ring.tres")
 	return null
 
 
@@ -164,6 +193,17 @@ func _physics_process(delta: float) -> void:
 	var to_player: Vector2 = player.global_position - global_position
 	var player_distance: float = to_player.length()
 	var spawn_distance: float = global_position.distance_to(_spawn_position)
+
+	# Phase 5 boss special: every few seconds, a roar hits the player
+	# if they are close. The warning number is the telegraph — step
+	# back out of range to avoid it.
+	if special_damage > 0 and special_cooldown > 0.0:
+		_special_timer -= delta
+		if _special_timer <= 0.0:
+			_special_timer = special_cooldown
+			if player_distance <= special_range:
+				player.take_damage(special_damage)
+				_spawn_damage_number_at(player.global_position, "Roar!", Color(1.0, 0.3, 0.3, 1.0))
 
 	if returning:
 		var to_spawn: Vector2 = _spawn_position - global_position

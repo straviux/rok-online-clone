@@ -4,6 +4,7 @@
 
 [resource]
 script = ExtResource("1_data")
+monster_id = "slime"
 monster_name = "Slime"
 max_hp = 30
 attack_damage = 5

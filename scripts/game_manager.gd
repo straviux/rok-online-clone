@@ -18,6 +18,12 @@ var equipment: Dictionary = {
 	"headgear": null,
 	"accessory": null,
 }
+# Phase 5 quests, in chain order. quests[quest_id] is a Dictionary:
+# {"data": QuestData, "state": String, "progress": int}.
+# States: "locked" (earlier quest not done), "available" (talk to the
+# Elder), "active", "done".
+var quest_order: Array = ["meet_elder", "slime_hunt", "herb_gathering", "wolf_hunt", "dungeon_boss"]
+var quests: Dictionary = {}
 
 
 func travel_to(scene_path: String, spawn: Vector2) -> void:
@@ -39,6 +45,106 @@ func _ready() -> void:
 		add_item(leather_armor, 1)
 		equip(wooden_sword)
 		equip(leather_armor)
+	# Quests init on their own guard, not inside the starting-gear
+	# block, so they are set up even if the inventory is not empty.
+	_init_quests()
+
+
+func _init_quests() -> void:
+	if not quests.is_empty():
+		return
+	var quest_files: Dictionary = {
+		"meet_elder": preload("res://data/quests/meet_elder.tres"),
+		"slime_hunt": preload("res://data/quests/slime_hunt.tres"),
+		"herb_gathering": preload("res://data/quests/herb_gathering.tres"),
+		"wolf_hunt": preload("res://data/quests/wolf_hunt.tres"),
+		"dungeon_boss": preload("res://data/quests/dungeon_boss.tres"),
+	}
+	for index: int in range(quest_order.size()):
+		var quest_id: String = quest_order[index]
+		quests[quest_id] = {
+			"data": quest_files[quest_id],
+			"state": "available" if index == 0 else "locked",
+			"progress": 0,
+		}
+
+
+func accept_quest(quest_id: String) -> void:
+	var quest: Dictionary = quests.get(quest_id, {})
+	if quest.is_empty() or quest["state"] != "available":
+		return
+	quest["state"] = "active"
+	# Talking to the Elder IS the talk quest's objective, so it
+	# completes as soon as it is accepted.
+	var data: QuestData = quest["data"]
+	if data.objective_type == "talk":
+		_complete_quest(quest_id)
+
+
+func notify_kill(monster_id: String) -> void:
+	if monster_id.is_empty():
+		return
+	for quest_id: String in quest_order:
+		var quest: Dictionary = quests[quest_id]
+		if quest["state"] != "active":
+			continue
+		var data: QuestData = quest["data"]
+		if data.objective_type in ["kill", "boss"] and data.target_id == monster_id:
+			quest["progress"] += 1
+			if quest["progress"] >= data.amount:
+				_complete_quest(quest_id)
+
+
+func notify_item_collected(item_id: String) -> void:
+	for quest_id: String in quest_order:
+		var quest: Dictionary = quests[quest_id]
+		if quest["state"] != "active":
+			continue
+		var data: QuestData = quest["data"]
+		if data.objective_type == "collect" and data.target_id == item_id:
+			quest["progress"] += 1
+			if quest["progress"] >= data.amount:
+				_complete_quest(quest_id)
+
+
+func _complete_quest(quest_id: String) -> void:
+	var quest: Dictionary = quests[quest_id]
+	var data: QuestData = quest["data"]
+	quest["state"] = "done"
+	quest["progress"] = data.amount
+	gold += data.reward_gold
+	if data.reward_item_id != "":
+		var reward_item: ItemData = _load_item(data.reward_item_id)
+		if reward_item != null:
+			add_item(reward_item, 1)
+	var player: Node = get_tree().get_first_node_in_group("player")
+	if player != null and player.has_method("gain_xp"):
+		player.gain_xp(data.reward_xp)
+	_show_quest_message("Quest complete: " + data.quest_name)
+	# Unlock the next quest in the chain.
+	var index: int = quest_order.find(quest_id)
+	if index >= 0 and index + 1 < quest_order.size():
+		var next_quest: Dictionary = quests[quest_order[index + 1]]
+		if next_quest["state"] == "locked":
+			next_quest["state"] = "available"
+
+
+func _load_item(item_id: String) -> ItemData:
+	match item_id:
+		"iron_sword":
+			return preload("res://data/items/iron_sword.tres")
+	return null
+
+
+func _show_quest_message(text_value: String) -> void:
+	var player: Node = get_tree().get_first_node_in_group("player")
+	if player == null:
+		return
+	var damage_number_scene: PackedScene = preload("res://scenes/ui/damage_number.tscn")
+	var number: Node = damage_number_scene.instantiate()
+	number.position = player.global_position + Vector2(0.0, -70.0)
+	get_tree().current_scene.add_child(number)
+	number.setup_damage(text_value, Color(0.4, 1.0, 0.4, 1.0))
 
 
 func _add_to_list(list: Array, item: ItemData, count: int) -> void:

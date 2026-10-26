@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="QuestData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/quest_data.gd" id="1_quest"]
+
+[resource]
+script = ExtResource("1_quest")
+quest_id = "slime_hunt"
+quest_name = "Slime Hunt"
+description = "The field is overrun with slimes. Defeat 5 of them."
+objective_type = "kill"
+target_id = "slime"
+target_label = "Slimes"
+amount = 5
+reward_xp = 50
+reward_gold = 30

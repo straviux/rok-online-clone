@@ -23,11 +23,12 @@ func _input(event: InputEvent) -> void:
 	# Esc closes ONLY the frontmost open panel, one per press.
 	# This has to live in exactly one place: when every panel handled
 	# Esc itself, one press closed them all. Order here is the panels'
-	# scene order (later = drawn in front): storage, shop, inventory,
-	# character. Press Esc repeatedly to close them front to back.
+	# scene order (later = drawn in front): dialogue, quest log,
+	# storage, shop, inventory, character. Press Esc repeatedly to
+	# close them front to back.
 	if event is InputEventKey:
 		if event.keycode == KEY_ESCAPE and event.pressed and not event.echo:
-			for group_name: String in ["storage_panel", "shop_panel", "inventory_panel", "character_panel"]:
+			for group_name: String in ["dialogue_panel", "quest_log_panel", "storage_panel", "shop_panel", "inventory_panel", "character_panel"]:
 				for panel: Node in get_tree().get_nodes_in_group(group_name):
 					if panel.visible:
 						panel.visible = false

@@ -1,0 +1,41 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/dialogue_panel.gd" id="1_panel"]
+
+[node name="DialoguePanel" type="CanvasLayer"]
+script = ExtResource("1_panel")
+
+[node name="Panel" type="ColorRect" parent="."]
+offset_left = 226.0
+offset_top = 174.0
+offset_right = 926.0
+offset_bottom = 474.0
+color = Color(0.1, 0.1, 0.15, 0.95)
+
+[node name="NameLabel" type="Label" parent="Panel"]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 580.0
+offset_bottom = 44.0
+text = "Elder"
+
+[node name="CloseButton" type="Button" parent="Panel"]
+offset_left = 600.0
+offset_top = 16.0
+offset_right = 684.0
+offset_bottom = 44.0
+text = "Close"
+
+[node name="TextLabel" type="Label" parent="Panel"]
+offset_left = 16.0
+offset_top = 56.0
+offset_right = 684.0
+offset_bottom = 200.0
+text = ""
+
+[node name="AcceptButton" type="Button" parent="Panel"]
+offset_left = 16.0
+offset_top = 220.0
+offset_right = 160.0
+offset_bottom = 252.0
+text = "Accept"

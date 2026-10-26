@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="QuestData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/quest_data.gd" id="1_quest"]
+
+[resource]
+script = ExtResource("1_quest")
+quest_id = "herb_gathering"
+quest_name = "Herb Gathering"
+description = "Mushrooms in the field sometimes drop wild herbs. Collect 3 of them."
+objective_type = "collect"
+target_id = "herb"
+target_label = "Herbs"
+amount = 3
+reward_xp = 60
+reward_gold = 40
