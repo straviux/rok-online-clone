@@ -16,12 +16,12 @@ You should spawn in town as a blue box character.
 
 ## Controls
 
-- **WASD** or **arrow keys** — move
-- **Left-click a monster** — target it (yellow marker, target HP bar in HUD)
-- **Left-click empty ground** — clear the target
-- Walk close to a targeted monster and you attack automatically
-  (damage and range grow with STR/DEX; see Phase 3 below).
-  There is no click-to-move yet.
+- **WASD** or **arrow keys** — move (WASD cancels click movement)
+- **Left-click a monster** — target it (yellow marker, target HP bar
+  in HUD), walk to it, and attack automatically once in range
+- **Left-click ground** — walk to that point (and drop any monster target)
+- If a clicked path is blocked by a wall, tree, or house for 0.5s,
+  click movement stops instead of pushing against it forever.
 - **1 Power Strike** (5 SP, 3s cooldown, x1.8 damage, needs a target in range)
 - **2 Heal** (10 SP, 5s cooldown, restores HP)
 - **3 Fire Bolt** (8 SP, 4s cooldown, 300 range, tracking projectile)

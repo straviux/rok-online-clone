@@ -13,8 +13,10 @@ extends CharacterBody2D
 ##   both x3 while in town (the current scene is named "Town").
 ## - Heal = 20 + INT*3, Fire Bolt = 15 + INT*3, Power Strike = x1.8 damage.
 ##
-## Combat (from Phase 2, unchanged in spirit):
-## - Left-click a monster to target it, left-click ground to clear it.
+## Combat (from Phase 2, plus click-to-move):
+## - Left-click a monster: target it AND walk to it, then attack
+##   automatically once in range. Left-click ground: walk to that point.
+## - WASD at any time cancels click movement (the target stays set).
 ## - While a target is alive and in range, basic attacks fire automatically.
 ## - Hotkeys: 1 Power Strike (5 SP, 3s), 2 Heal (10 SP, 5s),
 ##   3 Fire Bolt (8 SP, 4s, 300 range), 4 HP Potion (+30 HP, starts with 3).
@@ -52,11 +54,19 @@ var potions: int = 3
 var target: Node = null
 var dying: bool = false
 
+# Click-to-move state. chasing = the click was on a monster (its position
+# is re-read every frame, so a moving monster is followed); otherwise the
+# click was on ground and click_destination is a fixed point.
+var click_moving: bool = false
+var click_chasing: bool = false
+var click_destination: Vector2 = Vector2.ZERO
+
 var power_strike_timer: float = 0.0
 var heal_timer: float = 0.0
 var fire_bolt_timer: float = 0.0
 
 var _attack_timer: float = 0.0
+var _click_stuck_timer: float = 0.0
 var _damage_number_scene: PackedScene = preload("res://scenes/ui/damage_number.tscn")
 var _fire_bolt_scene: PackedScene = preload("res://scenes/skills/fire_bolt.tscn")
 
@@ -162,21 +172,30 @@ func _input(event: InputEvent) -> void:
 
 
 func _target_at_mouse() -> void:
-	# Clicking a + button on the character panel must not retarget.
+	# Clicking a + button on the character panel must not retarget/move.
 	for panel: Node in get_tree().get_nodes_in_group("character_panel"):
 		if panel.visible:
 			return
+	var mouse_position: Vector2 = get_global_mouse_position()
 	var space_state: PhysicsDirectSpaceState2D = get_world_2d().direct_space_state
 	var query := PhysicsPointQueryParameters2D.new()
-	query.position = get_global_mouse_position()
+	query.position = mouse_position
 	query.collide_with_bodies = true
 	var results: Array = space_state.intersect_point(query)
 	for result: Dictionary in results:
 		var collider: Object = result["collider"]
 		if collider is Node and collider.is_in_group("monsters"):
 			set_target(collider)
+			click_chasing = true
+			click_moving = true
+			_click_stuck_timer = 0.0
 			return
+	# Ground click: walk there, and drop any monster target.
 	set_target(null)
+	click_chasing = false
+	click_destination = mouse_position
+	click_moving = true
+	_click_stuck_timer = 0.0
 
 
 func _target_ready() -> bool:
@@ -288,8 +307,48 @@ func _physics_process(delta: float) -> void:
 	if Input.is_key_pressed(KEY_S) or Input.is_key_pressed(KEY_DOWN):
 		direction.y += 1.0
 
-	velocity = direction.normalized() * speed
+	if direction != Vector2.ZERO:
+		# WASD always wins and cancels click movement (target stays set).
+		click_moving = false
+		click_chasing = false
+		_click_stuck_timer = 0.0
+		velocity = direction.normalized() * speed
+	elif click_moving:
+		if click_chasing:
+			if not _target_ready():
+				click_moving = false
+				click_chasing = false
+				velocity = Vector2.ZERO
+			elif global_position.distance_to(target.global_position) <= attack_range:
+				# In range: stand still, _attack_target below does the work.
+				velocity = Vector2.ZERO
+			else:
+				velocity = (target.global_position - global_position).normalized() * speed
+		elif global_position.distance_to(click_destination) < 8.0:
+			click_moving = false
+			velocity = Vector2.ZERO
+		else:
+			velocity = (click_destination - global_position).normalized() * speed
+	else:
+		velocity = Vector2.ZERO
+
+	var intended_moving: bool = velocity.length() > 0.0
 	move_and_slide()
+
+	# Stuck detection: if we tried to move but barely did (a wall, tree,
+	# or house in the way) for 0.5s, stop trying instead of pushing forever.
+	if click_moving and intended_moving and velocity.length() < 20.0:
+		var stuck_destination: Vector2 = target.global_position if click_chasing and _target_ready() else click_destination
+		if global_position.distance_to(stuck_destination) > 20.0:
+			_click_stuck_timer += delta
+			if _click_stuck_timer > 0.5:
+				click_moving = false
+				click_chasing = false
+				_click_stuck_timer = 0.0
+		else:
+			_click_stuck_timer = 0.0
+	else:
+		_click_stuck_timer = 0.0
 
 	if velocity.x < 0.0:
 		sprite.flip_h = true
