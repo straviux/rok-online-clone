@@ -23,11 +23,20 @@ offset_top = 72.0
 offset_right = 248.0
 offset_bottom = 96.0
 
+[node name="XPLabel" type="Label" parent="."]
+offset_left = 48.0
+offset_top = 72.0
+offset_right = 248.0
+offset_bottom = 96.0
+horizontal_alignment = 1
+vertical_alignment = 1
+text = ""
+
 [node name="LevelLabel" type="Label" parent="."]
 offset_left = 256.0
-offset_top = 16.0
+offset_top = 72.0
 offset_right = 340.0
-offset_bottom = 40.0
+offset_bottom = 96.0
 text = "Lv 1"
 
 [node name="GoldLabel" type="Label" parent="."]
@@ -36,6 +45,14 @@ offset_top = 44.0
 offset_right = 340.0
 offset_bottom = 68.0
 text = "Gold: 0"
+
+[node name="XPIcon" type="TextureRect" parent="."]
+offset_left = 24.0
+offset_top = 76.0
+offset_right = 40.0
+offset_bottom = 92.0
+stretch_mode = 0
+expand_mode = 1
 
 [node name="TargetLabel" type="Label" parent="."]
 offset_left = 400.0
@@ -81,19 +98,25 @@ offset_bottom = 640.0
 text = "WASD/click to move. Click monster to attack. 1 Strike, 3 Bolt: press the key, then click a monster. 2 Heal, 4 Potion. C Stats, I Inventory, Q Quests, E NPCs, Esc close front."
 
 [node name="HeartIcon" type="TextureRect" parent="."]
-offset_left = 16.0
-offset_top = 16.0
+offset_left = 24.0
+offset_top = 20.0
 offset_right = 40.0
-offset_bottom = 40.0
+offset_bottom = 36.0
+stretch_mode = 0
+expand_mode = 1
 
 [node name="ManaIcon" type="TextureRect" parent="."]
-offset_left = 16.0
-offset_top = 44.0
+offset_left = 24.0
+offset_top = 48.0
 offset_right = 40.0
-offset_bottom = 68.0
+offset_bottom = 64.0
+stretch_mode = 0
+expand_mode = 1
 
 [node name="CoinIcon" type="TextureRect" parent="."]
-offset_left = 224.0
-offset_top = 44.0
+offset_left = 232.0
+offset_top = 48.0
 offset_right = 248.0
-offset_bottom = 68.0
+offset_bottom = 64.0
+stretch_mode = 0
+expand_mode = 1

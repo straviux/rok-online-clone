@@ -12,6 +12,7 @@ extends CanvasLayer
 @onready var skill_label: Label = $SkillLabel
 @onready var cast_label: Label = $CastLabel
 @onready var cast_bar: ProgressBar = $CastBar
+@onready var xp_label: Label = $XPLabel
 
 
 func _ready() -> void:
@@ -20,6 +21,7 @@ func _ready() -> void:
 	($HeartIcon as TextureRect).texture = UISprites.get_texture("heart")
 	($ManaIcon as TextureRect).texture = UISprites.get_texture("mana_crystal")
 	($CoinIcon as TextureRect).texture = UISprites.get_texture("gold_coin")
+	($XPIcon as TextureRect).texture = UISprites.get_texture("star")
 	hp_bar.show_percentage = false
 	sp_bar.show_percentage = false
 	xp_bar.show_percentage = false
@@ -68,6 +70,7 @@ func _process(_delta: float) -> void:
 	sp_bar.value = player.sp
 	xp_bar.max_value = player.xp_to_next()
 	xp_bar.value = player.xp
+	xp_label.text = "%d / %d" % [int(player.xp), player.xp_to_next()]
 	if player.stat_points > 0:
 		level_label.text = "Lv %d (%d pts)" % [player.level, player.stat_points]
 	else:

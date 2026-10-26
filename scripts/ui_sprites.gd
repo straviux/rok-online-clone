@@ -1,7 +1,7 @@
 # UISprites: Pixel Fantasy UI Pack, converted to code so the
 # project stays plain text and pushable (no PNGs). dialog_box is
 # the pack's dialog box resized to 700x230 (the dialogue panel's
-# size); heart/mana_crystal/gold_coin are the icons-sheet cells
+# size); heart/mana_crystal/gold_coin/star are the icons-sheet cells
 # resized to 32x32. '.' is transparent; other characters index
 # the image's 64-colour palette (charset A-Za-z0-9+/).
 # Credit required: "UI art: Zanyar's Asset Store". The pack's
@@ -361,6 +361,44 @@ const IMAGES := {
 		],
 	},
 
+
+	"star": {
+		"palette": [Color8(72, 47, 8, 255), Color8(68, 43, 7, 255), Color8(91, 63, 12, 255), Color8(246, 226, 83, 255), Color8(250, 200, 28, 255), Color8(80, 55, 18, 255), Color8(254, 247, 106, 255), Color8(253, 218, 56, 255), Color8(111, 77, 11, 255), Color8(214, 171, 29, 255), Color8(253, 239, 94, 255), Color8(255, 207, 33, 255), Color8(190, 131, 3, 255), Color8(105, 69, 7, 255), Color8(171, 125, 15, 255), Color8(254, 229, 73, 255), Color8(238, 177, 14, 255), Color8(141, 93, 4, 255), Color8(63, 40, 12, 255), Color8(38, 19, 4, 255), Color8(252, 243, 104, 255), Color8(253, 201, 28, 255), Color8(42, 24, 9, 255), Color8(209, 152, 10, 255), Color8(254, 233, 78, 255), Color8(255, 204, 31, 255), Color8(163, 109, 2, 255), Color8(254, 197, 22, 255), Color8(227, 164, 10, 255), Color8(213, 148, 2, 255), Color8(198, 137, 5, 255), Color8(75, 48, 8, 255), Color8(49, 29, 10, 255), Color8(243, 188, 22, 255), Color8(243, 192, 25, 255), Color8(249, 194, 24, 255), Color8(254, 237, 83, 255), Color8(254, 201, 27, 255), Color8(224, 158, 6, 255), Color8(246, 193, 25, 255), Color8(84, 54, 5, 255), Color8(220, 197, 64, 255), Color8(254, 199, 25, 255), Color8(254, 202, 29, 255), Color8(255, 203, 29, 255), Color8(255, 204, 29, 255), Color8(255, 204, 28, 255), Color8(255, 201, 26, 255), Color8(255, 202, 29, 255), Color8(254, 202, 27, 255), Color8(254, 201, 28, 255), Color8(254, 202, 28, 255), Color8(127, 83, 3, 255), Color8(211, 145, 2, 255), Color8(206, 141, 1, 255), Color8(229, 173, 18, 255), Color8(205, 145, 6, 255), Color8(247, 208, 50, 255), Color8(216, 158, 11, 255), Color8(250, 197, 27, 255), Color8(255, 203, 27, 255), Color8(241, 183, 18, 255), Color8(80, 50, 4, 255), Color8(54, 37, 19, 255)],
+		"rows": [
+			"................................",
+			"................................",
+			"................................",
+			"................................",
+			"...............AB...............",
+			"..............CDEC..............",
+			"..............FGHC..............",
+			".............IJKLMN.............",
+			"............AOPKLQRS............",
+			"...........TOPUULVQRW...........",
+			"...........CXHUYLZQaC...........",
+			"........AABJLHKbVZcdeBAf........",
+			"....gWTfhiijPGklVLcmEinnoTgg....",
+			"...SXpppkkkYKGHqrrnntuuuJJXaS...",
+			"...SOpYkYUGGUYLvwxttyzttjbcRS...",
+			"....W0djbPKKklvwzwzVsEjj1eRW....",
+			".....gIcEwwrzrzzlzzyZQ22m0g.....",
+			"......BNmdQvlxzzlyyt311dNF......",
+			"........NX5HqzzxxzVZ62MIA.......",
+			"........W3YKbrsuwzVt3mMW........",
+			"........WJPPqZ7js8zyL9ag........",
+			"........fDPbr7cmh7sVZ9Mf........",
+			".......o7UHq721d1mrVtQe4o.......",
+			".......oxLLhmm0o+0ccZEQ1+.......",
+			".......oZu9c00F//F0R3n72+.......",
+			".......ohjMaSW....WSae91o.......",
+			".......+e2CW........WN2eo.......",
+			"........Bf............fA........",
+			"................................",
+			"................................",
+			"................................",
+			"................................",
+		],
+	},
 }
 
 const _CHARSET := "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
