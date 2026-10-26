@@ -1,4 +1,8 @@
 extends Node2D
+## NameLabel (in npc.tscn) is centered and sits just above the head:
+## offsets -58..-38 on an 80px box, horizontal_alignment = CENTER.
+## The old -70..-50 left-aligned label floated a tile above the head
+## and short names started 40px left of center.
 ## Phase 4 NPC: a shopkeeper or a storage keeper in town.
 ## Phase 5 adds a quest NPC (the Elder): same E interaction, but it
 ## opens the dialogue panel instead of a shop/storage panel.
