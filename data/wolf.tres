@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="MonsterData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/monster_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+monster_name = "Wolf"
+max_hp = 60
+attack_damage = 12
+speed = 110.0
+xp = 25
+aggro_range = 180.0
+attack_range = 45.0
+attack_cooldown = 0.9
+leash_range = 400.0
+color = Color(0.55, 0.55, 0.6, 1)
+gold_drop = 8
+respawn_time = 8.0
