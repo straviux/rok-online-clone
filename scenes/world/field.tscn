@@ -38,6 +38,8 @@ ground_width = 2000
 ground_height = 1200
 
 
+[node name="Decor" type="Node2D" parent="."]
+
 [node name="Actors" type="Node2D" parent="."]
 y_sort_enabled = true
 [node name="HUD" parent="." instance=ExtResource("4_hud")]
@@ -54,60 +56,60 @@ position = Vector2(0, 470)
 [node name="Tree1" type="StaticBody2D" parent="Actors"]
 position = Vector2(-400, -300)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Tree1"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Actors/Tree1"]
 shape = SubResource("Shape_tree")
 
-[node name="Sprite2D" type="Sprite2D" parent="Tree1"]
+[node name="Sprite2D" type="Sprite2D" parent="Actors/Tree1"]
 script = ExtResource("15_sprite_node")
 sprite_name = "tree"
 
 [node name="Tree2" type="StaticBody2D" parent="Actors"]
 position = Vector2(400, -300)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Tree2"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Actors/Tree2"]
 shape = SubResource("Shape_tree")
 
-[node name="Sprite2D" type="Sprite2D" parent="Tree2"]
+[node name="Sprite2D" type="Sprite2D" parent="Actors/Tree2"]
 script = ExtResource("15_sprite_node")
 sprite_name = "tree"
 
 [node name="Tree3" type="StaticBody2D" parent="Actors"]
 position = Vector2(-700, 0)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Tree3"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Actors/Tree3"]
 shape = SubResource("Shape_tree")
 
-[node name="Sprite2D" type="Sprite2D" parent="Tree3"]
+[node name="Sprite2D" type="Sprite2D" parent="Actors/Tree3"]
 script = ExtResource("15_sprite_node")
 sprite_name = "tree"
 
 [node name="Tree4" type="StaticBody2D" parent="Actors"]
 position = Vector2(700, 0)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Tree4"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Actors/Tree4"]
 shape = SubResource("Shape_tree")
 
-[node name="Sprite2D" type="Sprite2D" parent="Tree4"]
+[node name="Sprite2D" type="Sprite2D" parent="Actors/Tree4"]
 script = ExtResource("15_sprite_node")
 sprite_name = "tree"
 
 [node name="Tree5" type="StaticBody2D" parent="Actors"]
 position = Vector2(0, -300)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Tree5"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Actors/Tree5"]
 shape = SubResource("Shape_tree")
 
-[node name="Sprite2D" type="Sprite2D" parent="Tree5"]
+[node name="Sprite2D" type="Sprite2D" parent="Actors/Tree5"]
 script = ExtResource("15_sprite_node")
 sprite_name = "tree"
 
 [node name="Rock1" type="StaticBody2D" parent="Actors"]
 position = Vector2(-250, 200)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Rock1"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Actors/Rock1"]
 shape = SubResource("Shape_rock")
 
-[node name="Sprite2D" type="Sprite2D" parent="Rock1"]
+[node name="Sprite2D" type="Sprite2D" parent="Actors/Rock1"]
 script = ExtResource("18_tile")
 tile_name = "rock"
 scale = Vector2(1.5, 1.5)
@@ -115,10 +117,10 @@ scale = Vector2(1.5, 1.5)
 [node name="Rock2" type="StaticBody2D" parent="Actors"]
 position = Vector2(250, -100)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Rock2"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Actors/Rock2"]
 shape = SubResource("Shape_rock")
 
-[node name="Sprite2D" type="Sprite2D" parent="Rock2"]
+[node name="Sprite2D" type="Sprite2D" parent="Actors/Rock2"]
 script = ExtResource("18_tile")
 tile_name = "rock"
 scale = Vector2(1.5, 1.5)
@@ -126,25 +128,25 @@ scale = Vector2(1.5, 1.5)
 [node name="WallTop" type="StaticBody2D" parent="Actors"]
 position = Vector2(0, -625)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="WallTop"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Actors/WallTop"]
 shape = SubResource("Shape_wall_h")
 
 [node name="WallBottom" type="StaticBody2D" parent="Actors"]
 position = Vector2(0, 625)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="WallBottom"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Actors/WallBottom"]
 shape = SubResource("Shape_wall_h")
 
 [node name="WallLeft" type="StaticBody2D" parent="Actors"]
 position = Vector2(-1025, 0)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="WallLeft"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Actors/WallLeft"]
 shape = SubResource("Shape_wall_v")
 
 [node name="WallRight" type="StaticBody2D" parent="Actors"]
 position = Vector2(1025, 0)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="WallRight"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Actors/WallRight"]
 shape = SubResource("Shape_wall_v")
 
 [node name="PortalToTown" type="Area2D" parent="Actors"]
@@ -153,10 +155,10 @@ script = ExtResource("3_portal")
 target_scene_path = "res://scenes/world/town.tscn"
 spawn_position = Vector2(0, -320)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PortalToTown"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Actors/PortalToTown"]
 shape = SubResource("Shape_portal")
 
-[node name="ColorRect" type="ColorRect" parent="PortalToTown"]
+[node name="ColorRect" type="ColorRect" parent="Actors/PortalToTown"]
 offset_left = -60.0
 offset_top = -40.0
 offset_right = 60.0
@@ -169,10 +171,10 @@ script = ExtResource("3_portal")
 target_scene_path = "res://scenes/world/dungeon.tscn"
 spawn_position = Vector2(0, 200)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PortalToDungeon"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Actors/PortalToDungeon"]
 shape = SubResource("Shape_portal")
 
-[node name="ColorRect" type="ColorRect" parent="PortalToDungeon"]
+[node name="ColorRect" type="ColorRect" parent="Actors/PortalToDungeon"]
 offset_left = -60.0
 offset_top = -40.0
 offset_right = 60.0
@@ -199,27 +201,27 @@ data = ExtResource("7_mushroom")
 position = Vector2(200, -400)
 data = ExtResource("8_wolf")
 
-[node name="Bush1" type="Sprite2D" parent="Actors"]
+[node name="Bush1" type="Sprite2D" parent="Decor"]
 script = ExtResource("18_tile")
 tile_name = "bush"
 position = Vector2(-600, 300)
 
-[node name="Bush2" type="Sprite2D" parent="Actors"]
+[node name="Bush2" type="Sprite2D" parent="Decor"]
 script = ExtResource("18_tile")
 tile_name = "bush"
 position = Vector2(600, -500)
 
-[node name="Flower1" type="Sprite2D" parent="Actors"]
+[node name="Flower1" type="Sprite2D" parent="Decor"]
 script = ExtResource("18_tile")
 tile_name = "flower"
 position = Vector2(-100, 400)
 
-[node name="Flower2" type="Sprite2D" parent="Actors"]
+[node name="Flower2" type="Sprite2D" parent="Decor"]
 script = ExtResource("18_tile")
 tile_name = "flower"
 position = Vector2(300, 300)
 
-[node name="MushroomDecor1" type="Sprite2D" parent="Actors"]
+[node name="MushroomDecor1" type="Sprite2D" parent="Decor"]
 script = ExtResource("18_tile")
 tile_name = "mushroom"
 position = Vector2(900, -200)
