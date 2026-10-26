@@ -21,15 +21,14 @@ func _on_close_pressed() -> void:
 
 
 func _input(event: InputEvent) -> void:
+	# Esc is handled centrally in hud.gd (frontmost panel only), so
+	# this panel must not close itself on Esc too — that is what made
+	# one Esc press close every open panel.
 	if event is InputEventKey:
-		if event.pressed and not event.echo:
-			if event.keycode == KEY_I:
-				visible = not visible
-				if visible:
-					refresh()
-			elif event.keycode == KEY_ESCAPE and visible:
-				# Esc closes whichever panel is in front.
-				visible = false
+		if event.keycode == KEY_I and event.pressed and not event.echo:
+			visible = not visible
+			if visible:
+				refresh()
 
 
 func refresh() -> void:

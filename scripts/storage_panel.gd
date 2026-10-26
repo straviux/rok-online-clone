@@ -2,7 +2,8 @@ extends CanvasLayer
 ## Phase 4 storage panel: opened by pressing E near the storage keeper.
 ## Left: your inventory, Deposit moves one item into storage.
 ## Right: storage, Withdraw moves one item back into inventory.
-## Esc or the Close button closes the panel.
+## Esc (handled centrally in hud.gd, frontmost panel only) or the
+## Close button closes the panel.
 
 @onready var gold_label: Label = $Panel/GoldLabel
 @onready var inventory_box: VBoxContainer = $Panel/InventoryBox
@@ -17,12 +18,6 @@ func _ready() -> void:
 
 func _on_close_pressed() -> void:
 	visible = false
-
-
-func _input(event: InputEvent) -> void:
-	if event is InputEventKey:
-		if event.keycode == KEY_ESCAPE and event.pressed and not event.echo:
-			visible = false
 
 
 func refresh() -> void:

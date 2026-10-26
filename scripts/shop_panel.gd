@@ -2,7 +2,8 @@ extends CanvasLayer
 ## Phase 4 shop panel: opened by pressing E near the shopkeeper.
 ## Left: stock to buy (first click arms "Confirm?", second click buys —
 ## that is the buy confirmation). Right: your inventory to sell, at
-## half the item's price. Esc or the Close button closes the panel.
+## half the item's price. Esc (handled centrally in hud.gd, frontmost
+## panel only) or the Close button closes the panel.
 
 var _stock: Array = [
 	preload("res://data/items/wooden_sword.tres"),
@@ -34,12 +35,6 @@ func _ready() -> void:
 
 func _on_close_pressed() -> void:
 	visible = false
-
-
-func _input(event: InputEvent) -> void:
-	if event is InputEventKey:
-		if event.keycode == KEY_ESCAPE and event.pressed and not event.echo:
-			visible = false
 
 
 func refresh() -> void:
