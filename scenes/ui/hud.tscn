@@ -57,12 +57,28 @@ offset_right = 900.0
 offset_bottom = 128.0
 text = ""
 
+[node name="CastLabel" type="Label" parent="."]
+offset_left = 16.0
+offset_top = 132.0
+offset_right = 500.0
+offset_bottom = 156.0
+visible = false
+text = "Casting..."
+
+[node name="CastBar" type="ProgressBar" parent="."]
+offset_left = 16.0
+offset_top = 160.0
+offset_right = 316.0
+offset_bottom = 184.0
+visible = false
+show_percentage = false
+
 [node name="HintLabel" type="Label" parent="."]
 offset_left = 16.0
 offset_top = 610.0
 offset_right = 1100.0
 offset_bottom = 640.0
-text = "WASD/click to move. Click monster to attack. 1 Strike, 2 Heal, 3 Bolt, 4 Potion. C Stats, I Inventory, Q Quests, E NPCs, Esc close front."
+text = "WASD/click to move. Click monster to attack. 1 Strike, 3 Bolt: press the key, then click a monster. 2 Heal, 4 Potion. C Stats, I Inventory, Q Quests, E NPCs, Esc close front."
 
 [node name="HeartIcon" type="TextureRect" parent="."]
 offset_left = 16.0

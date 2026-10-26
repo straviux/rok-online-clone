@@ -10,6 +10,8 @@ extends CanvasLayer
 @onready var target_label: Label = $TargetLabel
 @onready var target_bar: ProgressBar = $TargetBar
 @onready var skill_label: Label = $SkillLabel
+@onready var cast_label: Label = $CastLabel
+@onready var cast_bar: ProgressBar = $CastBar
 
 
 func _ready() -> void:
@@ -22,6 +24,7 @@ func _ready() -> void:
 	sp_bar.show_percentage = false
 	xp_bar.show_percentage = false
 	target_bar.show_percentage = false
+	cast_bar.show_percentage = false
 
 
 func _input(event: InputEvent) -> void:
@@ -38,6 +41,10 @@ func _input(event: InputEvent) -> void:
 					if panel.visible:
 						panel.visible = false
 						return
+			# No panel open: Esc cancels an armed skill instead.
+			var player_node: Node = get_tree().get_first_node_in_group("player")
+			if player_node != null and player_node.pending_skill != "":
+				player_node.pending_skill = ""
 
 
 func _cooldown_text(timer: float) -> String:
@@ -67,6 +74,17 @@ func _process(_delta: float) -> void:
 		_cooldown_text(player.fire_bolt_timer),
 		GameManager.count_item("hp_potion") + GameManager.count_item("small_hp_potion"),
 	]
+	if player.pending_skill != "":
+		skill_label.text += "  |  %s armed - click a monster" % player._skill_display_name(player.pending_skill)
+	if player.casting_skill != "":
+		cast_label.text = "Casting %s..." % player._skill_display_name(player.casting_skill)
+		cast_bar.max_value = player.casting_duration
+		cast_bar.value = player.casting_duration - player.casting_time_left
+		cast_label.visible = true
+		cast_bar.visible = true
+	else:
+		cast_label.visible = false
+		cast_bar.visible = false
 
 	var target: Node = player.target
 	if target != null and is_instance_valid(target) and not target.dead:

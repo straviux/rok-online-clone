@@ -20,11 +20,11 @@ offset_bottom = 44.0
 text = "Character (press C to close)"
 
 [node name="CloseButton" type="Button" parent="Panel"]
-offset_left = 400.0
+offset_left = 444.0
 offset_top = 16.0
 offset_right = 484.0
 offset_bottom = 44.0
-text = "Close"
+text = "✕"
 
 [node name="LevelLabel" type="Label" parent="Panel"]
 offset_left = 16.0

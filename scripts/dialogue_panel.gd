@@ -48,7 +48,7 @@ func refresh() -> void:
 			_current_quest_id = quest_id
 			text_label.text = data.description + "\n\nAccept this quest?"
 			accept_button.visible = true
-			accept_button.text = "Accept"
+			accept_button.text = "✓"
 		elif quest["state"] == "active":
 			text_label.text = data.description + "\n\nProgress: %s: %d/%d" % [
 				data.target_label,

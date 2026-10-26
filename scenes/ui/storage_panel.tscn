@@ -20,11 +20,11 @@ offset_bottom = 44.0
 text = "Storage (E near the keeper, Esc to close)"
 
 [node name="CloseButton" type="Button" parent="Panel"]
-offset_left = 600.0
+offset_left = 644.0
 offset_top = 16.0
 offset_right = 684.0
 offset_bottom = 44.0
-text = "Close"
+text = "✕"
 
 [node name="GoldLabel" type="Label" parent="Panel"]
 offset_left = 16.0

@@ -18,6 +18,13 @@ extends CharacterBody2D
 ##   automatically once in range. Left-click ground: walk to that point.
 ## - WASD at any time cancels click movement (the target stays set).
 ## - While a target is alive and in range, basic attacks fire automatically.
+## - Skills are press-then-click: pressing 1 (Power Strike) or 3
+##   (Fire Bolt) arms the skill, and the next left-click on a monster
+##   casts it on that monster. Clicking ground cancels the arming and
+##   walks there; pressing the same key again or Esc also cancels.
+##   Every skill has a cast time (Strike 0.5s, Bolt 0.8s, Heal 0.6s):
+##   while casting the player stands still and a cast bar shows in
+##   the HUD, then the effect lands. Taking damage does NOT interrupt.
 ## - Hotkeys: 1 Power Strike (5 SP, 3s), 2 Heal (10 SP, 5s),
 ##   3 Fire Bolt (8 SP, 4s, 300 range), 4 use an HP potion from inventory.
 ## - C opens the character panel, where stat points are spent with + buttons.
@@ -67,6 +74,16 @@ var click_destination: Vector2 = Vector2.ZERO
 var power_strike_timer: float = 0.0
 var heal_timer: float = 0.0
 var fire_bolt_timer: float = 0.0
+
+# Press-then-click targeting: pressing 1 or 3 arms that skill here;
+# the next left-click on a monster casts it. "" means nothing armed.
+var pending_skill: String = ""
+# Casting: a started cast lands after cast_time_left reaches 0.
+# casting_skill "" means not casting; casting_target is null for Heal.
+var casting_skill: String = ""
+var casting_target: Node = null
+var casting_time_left: float = 0.0
+var casting_duration: float = 0.0
 
 var _attack_timer: float = 0.0
 var _click_stuck_timer: float = 0.0
@@ -215,13 +232,17 @@ func _input(event: InputEvent) -> void:
 			_target_at_mouse()
 	elif event is InputEventKey:
 		if event.pressed and not event.echo:
+			if casting_skill != "" and event.keycode in [KEY_1, KEY_2, KEY_3]:
+				# Already casting: skill keys wait, the cast bar shows why.
+				return
 			match event.keycode:
 				KEY_1:
-					_cast_power_strike()
+					_toggle_pending("power_strike")
 				KEY_2:
-					_cast_heal()
+					pending_skill = ""
+					_start_heal_cast()
 				KEY_3:
-					_cast_fire_bolt()
+					_toggle_pending("fire_bolt")
 				KEY_4:
 					_use_potion()
 
@@ -232,6 +253,9 @@ func _target_at_mouse() -> void:
 		for panel: Node in get_tree().get_nodes_in_group(group_name):
 			if panel.visible:
 				return
+	if casting_skill != "":
+		# Clicks during a cast are ignored: movement is locked anyway.
+		return
 	var mouse_position: Vector2 = get_global_mouse_position()
 	var space_state: PhysicsDirectSpaceState2D = get_world_2d().direct_space_state
 	var query := PhysicsPointQueryParameters2D.new()
@@ -241,12 +265,22 @@ func _target_at_mouse() -> void:
 	for result: Dictionary in results:
 		var collider: Object = result["collider"]
 		if collider is Node and collider.is_in_group("monsters"):
-			set_target(collider)
-			click_chasing = true
-			click_moving = true
-			_click_stuck_timer = 0.0
+			if pending_skill != "":
+				# Armed skill: this click IS the cast, not a chase.
+				var skill := pending_skill
+				pending_skill = ""
+				set_target(collider)
+				click_moving = false
+				click_chasing = false
+				_start_cast(skill, collider)
+			else:
+				set_target(collider)
+				click_chasing = true
+				click_moving = true
+				_click_stuck_timer = 0.0
 			return
-	# Ground click: walk there, and drop any monster target.
+	# Ground click: cancels any arming, then walks there as usual.
+	pending_skill = ""
 	set_target(null)
 	click_chasing = false
 	click_destination = mouse_position
@@ -258,60 +292,124 @@ func _target_ready() -> bool:
 	return target != null and is_instance_valid(target) and not target.dead
 
 
-func _cast_power_strike() -> void:
-	if not _target_ready():
+func _skill_cast_time(skill: String) -> float:
+	match skill:
+		"power_strike":
+			return 0.5
+		"fire_bolt":
+			return 0.8
+		"heal":
+			return 0.6
+	return 0.0
+
+
+func _skill_display_name(skill: String) -> String:
+	match skill:
+		"power_strike":
+			return "Power Strike"
+		"fire_bolt":
+			return "Fire Bolt"
+		"heal":
+			return "Heal"
+	return skill
+
+
+func _toggle_pending(skill: String) -> void:
+	# Pressing the armed skill's key again disarms it; pressing the
+	# other skill's key switches the arming to that skill.
+	if pending_skill == skill:
+		pending_skill = ""
+	else:
+		pending_skill = skill
+
+
+func _start_cast(skill: String, cast_target: Node) -> bool:
+	# Checks first (nothing is spent on a failed cast), then SP and
+	# cooldown are spent and the cast bar starts ticking.
+	if cast_target == null or not is_instance_valid(cast_target) or cast_target.dead:
 		_show_message("No target", Color(1.0, 1.0, 1.0, 1.0))
-		return
-	if global_position.distance_to(target.global_position) > attack_range:
-		_show_message("Out of range", Color(1.0, 1.0, 1.0, 1.0))
-		return
-	if power_strike_timer > 0.0:
-		_show_message("Cooling down", Color(1.0, 1.0, 1.0, 1.0))
-		return
-	if sp < 5.0:
-		_show_message("Not enough SP", Color(0.4, 0.7, 1.0, 1.0))
-		return
-	sp -= 5.0
-	power_strike_timer = 3.0
-	target.take_damage(int(attack_damage * 1.8))
+		return false
+	if skill == "power_strike":
+		if global_position.distance_to(cast_target.global_position) > attack_range:
+			_show_message("Out of range", Color(1.0, 1.0, 1.0, 1.0))
+			return false
+		if power_strike_timer > 0.0:
+			_show_message("Cooling down", Color(1.0, 1.0, 1.0, 1.0))
+			return false
+		if sp < 5.0:
+			_show_message("Not enough SP", Color(0.4, 0.7, 1.0, 1.0))
+			return false
+		sp -= 5.0
+		power_strike_timer = 3.0
+	elif skill == "fire_bolt":
+		if global_position.distance_to(cast_target.global_position) > 300.0:
+			_show_message("Out of range", Color(1.0, 1.0, 1.0, 1.0))
+			return false
+		if fire_bolt_timer > 0.0:
+			_show_message("Cooling down", Color(1.0, 1.0, 1.0, 1.0))
+			return false
+		if sp < 8.0:
+			_show_message("Not enough SP", Color(0.4, 0.7, 1.0, 1.0))
+			return false
+		sp -= 8.0
+		fire_bolt_timer = 4.0
+	else:
+		return false
+	casting_skill = skill
+	casting_target = cast_target
+	casting_duration = _skill_cast_time(skill)
+	casting_time_left = casting_duration
+	return true
 
 
-func _cast_heal() -> void:
+func _start_heal_cast() -> bool:
 	if hp >= float(max_hp):
 		_show_message("HP full", Color(0.4, 1.0, 0.4, 1.0))
-		return
+		return false
 	if heal_timer > 0.0:
 		_show_message("Cooling down", Color(1.0, 1.0, 1.0, 1.0))
-		return
+		return false
 	if sp < 10.0:
 		_show_message("Not enough SP", Color(0.4, 0.7, 1.0, 1.0))
-		return
+		return false
 	sp -= 10.0
 	heal_timer = 5.0
-	hp = min(float(max_hp), hp + float(heal_amount))
-	_show_message("+%d" % heal_amount, Color(0.4, 1.0, 0.4, 1.0))
+	casting_skill = "heal"
+	casting_target = null
+	casting_duration = _skill_cast_time("heal")
+	casting_time_left = casting_duration
+	return true
 
 
-func _cast_fire_bolt() -> void:
-	if not _target_ready():
-		_show_message("No target", Color(1.0, 1.0, 1.0, 1.0))
-		return
-	if global_position.distance_to(target.global_position) > 300.0:
-		_show_message("Out of range", Color(1.0, 1.0, 1.0, 1.0))
-		return
-	if fire_bolt_timer > 0.0:
-		_show_message("Cooling down", Color(1.0, 1.0, 1.0, 1.0))
-		return
-	if sp < 8.0:
-		_show_message("Not enough SP", Color(0.4, 0.7, 1.0, 1.0))
-		return
-	sp -= 8.0
-	fire_bolt_timer = 4.0
-	var bolt: Node = _fire_bolt_scene.instantiate()
-	bolt.position = global_position
-	bolt.target = target
-	bolt.damage = fire_bolt_damage
-	get_tree().current_scene.add_child(bolt)
+func _finish_cast() -> void:
+	# The effect lands only now, at the end of the cast time. A target
+	# that died or (for the melee strike) walked out of range fizzles.
+	var skill := casting_skill
+	var cast_target := casting_target
+	casting_skill = ""
+	casting_target = null
+	casting_time_left = 0.0
+	casting_duration = 0.0
+	match skill:
+		"power_strike":
+			if cast_target == null or not is_instance_valid(cast_target) or cast_target.dead:
+				_show_message("Fizzled", Color(1.0, 1.0, 1.0, 1.0))
+			elif global_position.distance_to(cast_target.global_position) > attack_range:
+				_show_message("Out of range", Color(1.0, 1.0, 1.0, 1.0))
+			else:
+				cast_target.take_damage(int(attack_damage * 1.8))
+		"fire_bolt":
+			if cast_target == null or not is_instance_valid(cast_target) or cast_target.dead:
+				_show_message("Fizzled", Color(1.0, 1.0, 1.0, 1.0))
+			else:
+				var bolt: Node = _fire_bolt_scene.instantiate()
+				bolt.position = global_position
+				bolt.target = cast_target
+				bolt.damage = fire_bolt_damage
+				get_tree().current_scene.add_child(bolt)
+		"heal":
+			hp = min(float(max_hp), hp + float(heal_amount))
+			_show_message("+%d" % heal_amount, Color(0.4, 1.0, 0.4, 1.0))
 
 
 func _use_potion() -> void:
@@ -381,6 +479,17 @@ func _physics_process(delta: float) -> void:
 	power_strike_timer = max(0.0, power_strike_timer - delta)
 	heal_timer = max(0.0, heal_timer - delta)
 	fire_bolt_timer = max(0.0, fire_bolt_timer - delta)
+
+	if casting_skill != "":
+		# Casting: stand still until the cast finishes, then the
+		# effect lands. No movement, no auto-attack while casting.
+		casting_time_left -= delta
+		if casting_time_left <= 0.0:
+			_finish_cast()
+		velocity = Vector2.ZERO
+		move_and_slide()
+		_update_animation()
+		return
 
 	var direction := Vector2.ZERO
 	if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_LEFT):
