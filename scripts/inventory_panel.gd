@@ -13,14 +13,23 @@ extends CanvasLayer
 func _ready() -> void:
 	add_to_group("inventory_panel")
 	visible = false
+	($Panel/CloseButton as Button).pressed.connect(_on_close_pressed)
+
+
+func _on_close_pressed() -> void:
+	visible = false
 
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey:
-		if event.keycode == KEY_I and event.pressed and not event.echo:
-			visible = not visible
-			if visible:
-				refresh()
+		if event.pressed and not event.echo:
+			if event.keycode == KEY_I:
+				visible = not visible
+				if visible:
+					refresh()
+			elif event.keycode == KEY_ESCAPE and visible:
+				# Esc closes whichever panel is in front.
+				visible = false
 
 
 func refresh() -> void:

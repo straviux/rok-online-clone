@@ -22,6 +22,7 @@ extends CanvasLayer
 func _ready() -> void:
 	add_to_group("character_panel")
 	visible = false
+	($Panel/CloseButton as Button).pressed.connect(_on_close_pressed)
 	($Panel/STRButton as Button).pressed.connect(_on_add_stat.bind("STR"))
 	($Panel/AGIButton as Button).pressed.connect(_on_add_stat.bind("AGI"))
 	($Panel/VITButton as Button).pressed.connect(_on_add_stat.bind("VIT"))
@@ -36,10 +37,18 @@ func _on_add_stat(stat_name: String) -> void:
 		player.spend_stat_point(stat_name)
 
 
+func _on_close_pressed() -> void:
+	visible = false
+
+
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey:
-		if event.keycode == KEY_C and event.pressed and not event.echo:
-			visible = not visible
+		if event.pressed and not event.echo:
+			if event.keycode == KEY_C:
+				visible = not visible
+			elif event.keycode == KEY_ESCAPE and visible:
+				# Esc closes whichever panel is in front.
+				visible = false
 
 
 func _process(_delta: float) -> void:

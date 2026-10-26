@@ -30,6 +30,8 @@ You should spawn in town as a blue box character.
 - **C** — character panel: spend stat points with the + buttons
 - **I** — inventory: equip gear with Equip, use potions with Use,
   unequip from the Equipped list
+- **Esc** — closes any open panel (character, inventory, shop, storage).
+  Every panel also has a Close button at its top right.
 - **E near the purple Shopkeeper in town** — shop: buy stock (click Buy
   twice to confirm), sell your items for half price, or Esc/Close to leave
 - **E near the cyan Storage Keeper in town** — storage: Deposit items
