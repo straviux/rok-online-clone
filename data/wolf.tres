@@ -20,3 +20,4 @@ respawn_time = 8.0
 drop_item_id = "wooden_ring"
 drop_chance = 0.15
 sprite_name = "wolf"
+laphkal_monster = "wolf"

@@ -30,7 +30,7 @@ func refresh() -> void:
 		var label_text: String = item.item_name
 		if item.stackable:
 			label_text += " x%d" % count
-		var button: Button = _add_row(inventory_box, label_text, "Deposit")
+		var button: Button = _add_row(inventory_box, label_text, "Deposit", item)
 		button.pressed.connect(_on_deposit_pressed.bind(item))
 	for slot: Dictionary in GameManager.storage:
 		var item: ItemData = slot["item"]
@@ -38,7 +38,7 @@ func refresh() -> void:
 		var label_text: String = item.item_name
 		if item.stackable:
 			label_text += " x%d" % count
-		var button: Button = _add_row(storage_box, label_text, "Withdraw")
+		var button: Button = _add_row(storage_box, label_text, "Withdraw", item)
 		button.pressed.connect(_on_withdraw_pressed.bind(item))
 
 
@@ -58,8 +58,17 @@ func _clear_box(box: VBoxContainer) -> void:
 		child.free()
 
 
-func _add_row(box: VBoxContainer, text_value: String, button_text: String) -> Button:
+func _add_row(box: VBoxContainer, text_value: String, button_text: String, item: ItemData = null) -> Button:
 	var row := HBoxContainer.new()
+	if item != null:
+		var icon_tex: Texture2D = ItemIcons.get_texture(item.item_id)
+		if icon_tex != null:
+			var icon_rect := TextureRect.new()
+			icon_rect.texture = icon_tex
+			icon_rect.custom_minimum_size = Vector2(32, 32)
+			icon_rect.expand_mode = TextureRect.EXPAND_KEEP_SIZE
+			row.add_child(icon_rect)
+
 	var label := Label.new()
 	label.text = text_value
 	label.size_flags_horizontal = 3

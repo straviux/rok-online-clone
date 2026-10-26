@@ -37,12 +37,13 @@ var _attack_timer: float = 0.0
 var _respawn_timer: float = 0.0
 var _special_timer: float = 0.0
 var _flash_timer: float = 0.0
+var _attack_anim_timer: float = 0.0
 
 var _damage_number_scene: PackedScene = preload("res://scenes/ui/damage_number.tscn")
 var _gold_pickup_scene: PackedScene = preload("res://scenes/items/gold_pickup.tscn")
 var _item_pickup_scene: PackedScene = preload("res://scenes/items/item_pickup.tscn")
 
-@onready var sprite: Sprite2D = $Sprite2D
+@onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
 @onready var hp_bar: ProgressBar = $HPBar
 @onready var target_marker: ColorRect = $TargetMarker
@@ -75,20 +76,29 @@ func _ready() -> void:
 	hp_bar.max_value = max_hp
 	hp_bar.value = hp
 	hp_bar.show_percentage = false
-	if data != null and data.sprite_name != "":
-		sprite.texture = SpriteData.get_texture(data.sprite_name)
-		# Sprites are 32x32, but scale to fit anyway so a differently
-		# sized sprite never breaks the 32x32 collision box.
-		var tex_size: Vector2 = sprite.texture.get_size()
-		var fit: float = 32.0 / max(tex_size.x, tex_size.y)
-		sprite.scale = Vector2(fit, fit)
-	elif sprite.texture == null:
+	if data != null and data.laphkal_monster != "":
+		_setup_laphkal_sprite(data.laphkal_monster)
+	elif data != null and data.sprite_name != "":
+		# Fallback for monsters without Laphkal art: one static frame
+		# from the generated sprite grid (or a coloured box).
+		var frames := SpriteFrames.new()
+		frames.add_animation("idle")
+		frames.set_animation_loop("idle", true)
+		frames.set_animation_speed("idle", 4.0)
+		frames.add_frame("idle", SpriteData.get_texture(data.sprite_name))
+		sprite.sprite_frames = frames
+		sprite.play("idle")
+	else:
+		var frames := SpriteFrames.new()
+		frames.add_animation("idle")
 		var image := Image.create(32, 32, false, Image.FORMAT_RGBA8)
 		if data != null:
 			image.fill(data.color)
 		else:
 			image.fill(Color(0.3, 0.9, 0.4, 1))
-		sprite.texture = ImageTexture.create_from_image(image)
+		frames.add_frame("idle", ImageTexture.create_from_image(image))
+		sprite.sprite_frames = frames
+		sprite.play("idle")
 
 
 func set_targeted(is_targeted: bool) -> void:
@@ -179,6 +189,42 @@ func _spawn_damage_number_at(at_position: Vector2, text_value: String, color_val
 	number.setup_damage(text_value, color_value)
 
 
+
+func _setup_laphkal_sprite(monster_name: String) -> void:
+	var frames := SpriteFrames.new()
+	var speeds := {"idle": 4.0, "walk": 8.0, "attack": 10.0}
+	var counts := {"idle": 4, "walk": 8, "attack": 4}
+	for anim: String in ["idle", "walk", "attack"]:
+		frames.add_animation(anim)
+		frames.set_animation_loop(anim, anim != "attack")
+		frames.set_animation_speed(anim, speeds[anim])
+		for i in counts[anim]:
+			var tex: Texture2D = MonsterSprites.get_frame(monster_name, anim, i)
+			if tex != null:
+				frames.add_frame(anim, tex)
+	sprite.sprite_frames = frames
+	sprite.play("idle")
+
+
+func _process(delta: float) -> void:
+	if dead:
+		return
+	if _attack_anim_timer > 0.0:
+		_attack_anim_timer -= delta
+		_play_anim("attack")
+	elif velocity.length() > 0.0:
+		_play_anim("walk")
+	else:
+		_play_anim("idle")
+
+
+func _play_anim(anim: String) -> void:
+	if sprite.sprite_frames == null or not sprite.sprite_frames.has_animation(anim):
+		return
+	if sprite.animation != anim or not sprite.is_playing():
+		sprite.play(anim)
+
+
 func _physics_process(delta: float) -> void:
 	if dead:
 		_respawn_timer -= delta
@@ -209,6 +255,7 @@ func _physics_process(delta: float) -> void:
 		if _special_timer <= 0.0:
 			_special_timer = special_cooldown
 			if player_distance <= special_range:
+				_attack_anim_timer = 0.4
 				player.take_damage(special_damage)
 				_spawn_damage_number_at(player.global_position, "Roar!", Color(1.0, 0.3, 0.3, 1.0))
 
@@ -235,6 +282,7 @@ func _physics_process(delta: float) -> void:
 		_attack_timer -= delta
 		if _attack_timer <= 0.0:
 			_attack_timer = attack_cooldown
+			_attack_anim_timer = 0.4
 			# take_damage returns the damage after defence, so the
 			# number shown matches the HP actually lost.
 			var dealt: int = player.take_damage(attack_damage)

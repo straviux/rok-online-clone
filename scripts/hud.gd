@@ -13,6 +13,11 @@ extends CanvasLayer
 
 
 func _ready() -> void:
+	# UI pack icons next to the bars (textures are code-generated, so
+	# they are assigned here rather than in the scene file).
+	($HeartIcon as TextureRect).texture = UISprites.get_texture("heart")
+	($ManaIcon as TextureRect).texture = UISprites.get_texture("mana_crystal")
+	($CoinIcon as TextureRect).texture = UISprites.get_texture("gold_coin")
 	hp_bar.show_percentage = false
 	sp_bar.show_percentage = false
 	xp_bar.show_percentage = false

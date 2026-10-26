@@ -20,6 +20,10 @@ extends Resource
 # no image files). If empty, monster.gd falls back to a coloured box
 # using color, as in Phases 2-5.
 @export var sprite_name: String = ""
+# Laphkal monster art (Pixel Fantasy Monsters Pack, converted to code
+# in scripts/monster_sprites.gd). If set, monster.gd builds an animated
+# sprite from it; sprite_name is the fallback for monsters without one.
+@export var laphkal_monster: String = ""
 @export var gold_drop: int = 3
 @export var respawn_time: float = 5.0
 # Phase 4 loot: one possible item drop, rolled on death.

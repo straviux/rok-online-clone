@@ -14,6 +14,7 @@ var _current_quest_id: String = ""
 
 
 func _ready() -> void:
+	($Panel as TextureRect).texture = UISprites.get_texture("dialog_box")
 	add_to_group("dialogue_panel")
 	visible = false
 	name_label.text = "Elder"

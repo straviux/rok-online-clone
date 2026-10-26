@@ -5,12 +5,11 @@
 [node name="DialoguePanel" type="CanvasLayer"]
 script = ExtResource("1_panel")
 
-[node name="Panel" type="ColorRect" parent="."]
+[node name="Panel" type="TextureRect" parent="."]
 offset_left = 226.0
-offset_top = 174.0
+offset_top = 200.0
 offset_right = 926.0
-offset_bottom = 474.0
-color = Color(0.1, 0.1, 0.15, 0.95)
+offset_bottom = 430.0
 
 [node name="NameLabel" type="Label" parent="Panel"]
 offset_left = 16.0
@@ -30,12 +29,12 @@ text = "Close"
 offset_left = 16.0
 offset_top = 56.0
 offset_right = 684.0
-offset_bottom = 200.0
+offset_bottom = 160.0
 text = ""
 
 [node name="AcceptButton" type="Button" parent="Panel"]
 offset_left = 16.0
-offset_top = 220.0
+offset_top = 176.0
 offset_right = 160.0
-offset_bottom = 252.0
+offset_bottom = 204.0
 text = "Accept"

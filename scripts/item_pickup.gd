@@ -7,12 +7,20 @@ var item: ItemData = null
 
 var _damage_number_scene: PackedScene = preload("res://scenes/ui/damage_number.tscn")
 
-@onready var color_rect: ColorRect = $ColorRect
+@onready var icon: Sprite2D = $Icon
 
 
 func _ready() -> void:
 	if item != null:
-		color_rect.color = item.color
+		# Laphkal icon if the pack has one for this item, otherwise
+		# the old coloured square (herb has no icon in the pack).
+		var tex: Texture2D = ItemIcons.get_texture(item.item_id)
+		if tex != null:
+			icon.texture = tex
+		else:
+			var image := Image.create(20, 20, false, Image.FORMAT_RGBA8)
+			image.fill(item.color)
+			icon.texture = ImageTexture.create_from_image(image)
 	body_entered.connect(_on_body_entered)
 
 

@@ -22,3 +22,4 @@ drop_chance = 0.2
 drop_item_id2 = "herb"
 drop_chance2 = 0.5
 sprite_name = "mushroom"
+laphkal_monster = "mushroom"

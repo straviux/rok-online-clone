@@ -127,14 +127,41 @@ data in code, and the whole project stays plain text and pushable.
   pressing E near one shows a floating greeting instead of
   opening a panel. Villagers are set on the town scene instance
   with `display_name`, `chibi_frame`, and `greeting`.
-- Monsters (32x32): slime, mushroom, wolf, skeleton, bat, goblin,
-  Dungeon Guardian — pixel grids in `scripts/sprite_data.gd`,
-  wired through `MonsterData.sprite_name`, with the old
-  coloured-box fallback if a sprite name is missing.
-- Houses (220x160), trees (64x64), rocks (48x48) in town and field,
-  also from `scripts/sprite_data.gd`, via
-  `scripts/sprite_node.gd` (a Sprite2D that draws by name).
-- Still flat colour by design: ground, walls, dungeon pillars, and
+- Monsters (32x32, animated): slime, mushroom, wolf, skeleton, bat,
+  goblin, Dungeon Guardian — Laphkal Pixel Fantasy Monsters Pack
+  frames (idle 4, walk 8, attack 4, all facing right, flipped by
+  `monster.gd`) converted to code in `scripts/monster_sprites.gd`
+  and wired through the new `MonsterData.laphkal_monster` field.
+  The old pixel grids in `scripts/sprite_data.gd` remain as the
+  fallback if that field is empty, and a coloured box if both are.
+  The unused pack monsters (dark acolyte, ghost wisp, giant spider,
+  imp, orc brute) are not converted yet.
+- Houses: the three town houses are now Laphkal Pixel Fantasy
+  Buildings Pack buildings (thatched cottage, stone cottage,
+  tavern), 200px wide, quantized to 64 colours in
+  `scripts/building_sprites.gd` and drawn by
+  `scripts/building_node.gd`, which shifts each sprite up so its
+  bottom lines up with the 220x160 collision box.
+- Ground: town and field floors are tiled grass (three variants in
+  a fixed pattern) and the dungeon floor is tiled stone, from the
+  Laphkal Pixel Fantasy Tileset Pack in `scripts/terrain_sprites.gd`
+  via `scripts/tiled_ground.gd`. Rocks in town/field use the pack's
+  rock tile (scaled 1.5x to stay ~48px); bushes, flowers, and a
+  mushroom decorate both maps via `scripts/terrain_tile_node.gd`.
+  Trees are still the generated sprites from `scripts/sprite_data.gd`
+  — the tileset pack has no standalone trees.
+- Items: inventory, shop, and storage rows show a Laphkal 2D Game
+  Icon Pack icon next to each item name (`scripts/item_icons.gd`),
+  and world pickups use the same icons (gold pickups use the coin
+  stack icon). Herb has no suitable icon in the pack, so it keeps
+  its coloured square, and both rings share the pack's single ring
+  icon.
+- UI: the dialogue panel background is the Pixel Fantasy UI Pack's
+  dialog box (`scripts/ui_sprites.gd`, resized to 700x230, so the
+  panel is shorter than before), and the HUD shows the pack's heart,
+  mana-crystal, and gold-coin icons beside the HP/SP bars and gold.
+  The pack's buttons, panel frame, and bars are not used yet.
+- Still flat colour by design: walls, dungeon pillars, and
   the glowing portals (a portal is a glow, not an object).
 
 To change a monster/world sprite, edit its grid in
@@ -143,7 +170,10 @@ different block from the chibi sheets into `scripts/chibi_sprites.gd`
 (the original sheets are not in the repo, for the binary reason
 above). Collision shapes are unchanged, so movement, targeting,
 and combat work exactly as before. Credit: character sprites by
-finalbossblues (finalbossblues.itch.io), free Asset Alliance pack.
+finalbossblues (finalbossblues.itch.io), free Asset Alliance pack;
+buildings, tileset, monsters, and icons by Laphkal (laphkal.itch.io),
+free for commercial use with credit; UI art by Zanyar's Asset Store,
+credit required.
 
 ## Known Phase 1 simplifications
 

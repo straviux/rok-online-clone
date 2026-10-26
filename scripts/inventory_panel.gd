@@ -38,7 +38,7 @@ func refresh() -> void:
 	for slot_name: String in ["weapon", "armor", "headgear", "accessory"]:
 		var equipped: ItemData = GameManager.equipment[slot_name]
 		if equipped != null:
-			_add_unequip_row(equipped_box, "%s: %s" % [slot_name.capitalize(), _summary(equipped, 1)], slot_name, false)
+			_add_unequip_row(equipped_box, "%s: %s" % [slot_name.capitalize(), _summary(equipped, 1)], slot_name, false, equipped)
 		else:
 			_add_unequip_row(equipped_box, "%s: (empty)" % slot_name.capitalize(), slot_name, true)
 	for slot: Dictionary in GameManager.inventory:
@@ -58,8 +58,17 @@ func _clear_box(box: VBoxContainer) -> void:
 		child.free()
 
 
-func _add_row(box: VBoxContainer, text_value: String, button_text: String) -> Button:
+func _add_row(box: VBoxContainer, text_value: String, button_text: String, item: ItemData = null) -> Button:
 	var row := HBoxContainer.new()
+	if item != null:
+		var icon_tex: Texture2D = ItemIcons.get_texture(item.item_id)
+		if icon_tex != null:
+			var icon_rect := TextureRect.new()
+			icon_rect.texture = icon_tex
+			icon_rect.custom_minimum_size = Vector2(32, 32)
+			icon_rect.expand_mode = TextureRect.EXPAND_KEEP_SIZE
+			row.add_child(icon_rect)
+
 	var label := Label.new()
 	label.text = text_value
 	label.size_flags_horizontal = 3
@@ -72,15 +81,15 @@ func _add_row(box: VBoxContainer, text_value: String, button_text: String) -> Bu
 
 
 func _add_item_row(box: VBoxContainer, text_value: String, button_text: String, item: ItemData, action: String) -> void:
-	var button: Button = _add_row(box, text_value, button_text)
+	var button: Button = _add_row(box, text_value, button_text, item)
 	if action == "none":
 		button.disabled = true
 	else:
 		button.pressed.connect(_on_item_pressed.bind(item, action))
 
 
-func _add_unequip_row(box: VBoxContainer, text_value: String, slot_name: String, disabled: bool) -> void:
-	var button: Button = _add_row(box, text_value, "Unequip")
+func _add_unequip_row(box: VBoxContainer, text_value: String, slot_name: String, disabled: bool, item: ItemData = null) -> void:
+	var button: Button = _add_row(box, text_value, "Unequip", item)
 	button.disabled = disabled
 	if not disabled:
 		button.pressed.connect(_on_unequip_pressed.bind(slot_name))

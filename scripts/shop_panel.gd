@@ -43,7 +43,7 @@ func refresh() -> void:
 	_clear_box(sell_box)
 	for stock_item: ItemData in _stock:
 		var button_text: String = "Confirm?" if _pending_buy == stock_item else "Buy"
-		var button: Button = _add_row(stock_box, "%s — %d gold%s" % [stock_item.item_name, stock_item.price, _bonus_text(stock_item)], button_text)
+		var button: Button = _add_row(stock_box, "%s — %d gold%s" % [stock_item.item_name, stock_item.price, _bonus_text(stock_item)], button_text, stock_item)
 		button.pressed.connect(_on_buy_pressed.bind(stock_item))
 	for slot: Dictionary in GameManager.inventory:
 		var item: ItemData = slot["item"]
@@ -52,7 +52,7 @@ func refresh() -> void:
 		if item.stackable:
 			label_text += " x%d" % count
 		label_text += " — sells for %d gold" % (item.price / 2)
-		var button: Button = _add_row(sell_box, label_text, "Sell")
+		var button: Button = _add_row(sell_box, label_text, "Sell", item)
 		button.pressed.connect(_on_sell_pressed.bind(item))
 
 
@@ -86,8 +86,17 @@ func _clear_box(box: VBoxContainer) -> void:
 		child.free()
 
 
-func _add_row(box: VBoxContainer, text_value: String, button_text: String) -> Button:
+func _add_row(box: VBoxContainer, text_value: String, button_text: String, item: ItemData = null) -> Button:
 	var row := HBoxContainer.new()
+	if item != null:
+		var icon_tex: Texture2D = ItemIcons.get_texture(item.item_id)
+		if icon_tex != null:
+			var icon_rect := TextureRect.new()
+			icon_rect.texture = icon_tex
+			icon_rect.custom_minimum_size = Vector2(32, 32)
+			icon_rect.expand_mode = TextureRect.EXPAND_KEEP_SIZE
+			row.add_child(icon_rect)
+
 	var label := Label.new()
 	label.text = text_value
 	label.size_flags_horizontal = 3

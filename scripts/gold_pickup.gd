@@ -4,8 +4,11 @@ extends Area2D
 
 @export var amount: int = 3
 
+@onready var icon: Sprite2D = $Icon
+
 
 func _ready() -> void:
+	icon.texture = ItemIcons.get_texture("gold")
 	body_entered.connect(_on_body_entered)
 
 

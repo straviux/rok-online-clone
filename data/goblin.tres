@@ -20,3 +20,4 @@ respawn_time = 12.0
 drop_item_id = "hp_potion"
 drop_chance = 0.25
 sprite_name = "goblin"
+laphkal_monster = "goblin"
