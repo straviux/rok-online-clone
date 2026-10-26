@@ -16,3 +16,5 @@ leash_range = 400.0
 color = Color(0.3, 0.9, 0.4, 1)
 gold_drop = 3
 respawn_time = 5.0
+drop_item_id = "small_hp_potion"
+drop_chance = 0.25

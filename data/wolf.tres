@@ -16,3 +16,5 @@ leash_range = 400.0
 color = Color(0.55, 0.55, 0.6, 1)
 gold_drop = 8
 respawn_time = 8.0
+drop_item_id = "wooden_ring"
+drop_chance = 0.15

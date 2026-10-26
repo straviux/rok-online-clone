@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/item_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+item_id = "novice_cap"
+item_name = "Novice Cap"
+description = "A simple cloth cap."
+item_type = 2
+price = 40
+stackable = false
+color = Color(0.8, 0.7, 0.4, 1)
+defence_bonus = 2

@@ -20,6 +20,8 @@ var leash_range: float = 400.0
 var gold_drop: int = 3
 var respawn_time: float = 5.0
 var xp: int = 10
+var drop_item_id: String = ""
+var drop_chance: float = 0.0
 
 var dead: bool = false
 var returning: bool = false
@@ -31,6 +33,7 @@ var _flash_timer: float = 0.0
 
 var _damage_number_scene: PackedScene = preload("res://scenes/ui/damage_number.tscn")
 var _gold_pickup_scene: PackedScene = preload("res://scenes/items/gold_pickup.tscn")
+var _item_pickup_scene: PackedScene = preload("res://scenes/items/item_pickup.tscn")
 
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
@@ -52,6 +55,8 @@ func _ready() -> void:
 		gold_drop = data.gold_drop
 		respawn_time = data.respawn_time
 		xp = data.xp
+		drop_item_id = data.drop_item_id
+		drop_chance = data.drop_chance
 	hp = max_hp
 	hp_bar.max_value = max_hp
 	hp_bar.value = hp
@@ -95,6 +100,25 @@ func _die() -> void:
 	pickup.amount = gold_drop
 	pickup.position = global_position + Vector2(randf_range(-12.0, 12.0), 0.0)
 	get_tree().current_scene.add_child(pickup)
+	# Phase 4 loot roll: one possible item, at its drop chance.
+	if drop_item_id != "" and randf() < drop_chance:
+		var loot_item: ItemData = _load_item(drop_item_id)
+		if loot_item != null:
+			var item_pickup: Node2D = _item_pickup_scene.instantiate()
+			item_pickup.item = loot_item
+			item_pickup.position = global_position + Vector2(randf_range(-20.0, 20.0), randf_range(-10.0, 10.0))
+			get_tree().current_scene.add_child(item_pickup)
+
+
+func _load_item(item_id: String) -> ItemData:
+	match item_id:
+		"small_hp_potion":
+			return preload("res://data/items/small_hp_potion.tres")
+		"sp_potion":
+			return preload("res://data/items/sp_potion.tres")
+		"wooden_ring":
+			return preload("res://data/items/wooden_ring.tres")
+	return null
 
 
 func _respawn() -> void:
@@ -164,8 +188,10 @@ func _physics_process(delta: float) -> void:
 		_attack_timer -= delta
 		if _attack_timer <= 0.0:
 			_attack_timer = attack_cooldown
-			player.take_damage(attack_damage)
-			_spawn_damage_number_at(player.global_position, str(attack_damage), Color(1.0, 0.3, 0.3, 1.0))
+			# take_damage returns the damage after defence, so the
+			# number shown matches the HP actually lost.
+			var dealt: int = player.take_damage(attack_damage)
+			_spawn_damage_number_at(player.global_position, str(dealt), Color(1.0, 0.3, 0.3, 1.0))
 		move_and_slide()
 		return
 

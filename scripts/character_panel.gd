@@ -15,6 +15,8 @@ extends CanvasLayer
 @onready var dex_label: Label = $Panel/DEXLabel
 @onready var luk_label: Label = $Panel/LUKLabel
 @onready var derived_label: Label = $Panel/DerivedLabel
+@onready var equipment1_label: Label = $Panel/EquipmentLabel1
+@onready var equipment2_label: Label = $Panel/EquipmentLabel2
 
 
 func _ready() -> void:
@@ -57,10 +59,25 @@ func _process(_delta: float) -> void:
 	int_label.text = "INT: %d" % player.stat_int
 	dex_label.text = "DEX: %d" % player.stat_dex
 	luk_label.text = "LUK: %d" % player.stat_luk
-	derived_label.text = "Attack: %d  Range: %d  Crit: %d%%  Heal: %d  Fire Bolt: %d" % [
+	derived_label.text = "Atk: %d  Def: %d  Range: %d  Crit: %d%%  Heal: %d  Bolt: %d" % [
 		player.attack_damage,
+		player.defence,
 		int(player.attack_range),
 		int(player.crit_chance * 100.0),
 		player.heal_amount,
 		player.fire_bolt_damage,
 	]
+	equipment1_label.text = "Weapon: %s  Armor: %s" % [
+		_equipment_name(GameManager.equipment["weapon"]),
+		_equipment_name(GameManager.equipment["armor"]),
+	]
+	equipment2_label.text = "Head: %s  Accessory: %s" % [
+		_equipment_name(GameManager.equipment["headgear"]),
+		_equipment_name(GameManager.equipment["accessory"]),
+	]
+
+
+func _equipment_name(item: ItemData) -> String:
+	if item == null:
+		return "(none)"
+	return item.item_name

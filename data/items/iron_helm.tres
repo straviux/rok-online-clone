@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/item_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+item_id = "iron_helm"
+item_name = "Iron Helm"
+description = "A sturdy iron helmet."
+item_type = 2
+price = 120
+stackable = false
+color = Color(0.55, 0.55, 0.6, 1)
+defence_bonus = 5
+hp_bonus = 10

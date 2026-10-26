@@ -1,9 +1,9 @@
-# Ragnarok-like Game — Phase 1 + Phase 2 + Phase 3
+# Ragnarok-like Game — Phase 1 + Phase 2 + Phase 3 + Phase 4
 
 A playable Godot 4 starting point: walk around, collide with the world,
 travel between town and field, fight monsters, gain XP and levels,
-spend stat points, and cast skills.
-No inventory, shops, quests, or dungeon yet — those are later phases.
+spend stat points, cast skills, collect loot, equip gear, and spend
+gold at the shop. No quests or dungeon yet — those are later phases.
 
 ## How to run it (Windows)
 
@@ -25,8 +25,15 @@ You should spawn in town as a blue box character.
 - **1 Power Strike** (5 SP, 3s cooldown, x1.8 damage, needs a target in range)
 - **2 Heal** (10 SP, 5s cooldown, restores HP)
 - **3 Fire Bolt** (8 SP, 4s cooldown, 300 range, tracking projectile)
-- **4 HP Potion** (+30 HP, you start with 3; no shop yet, so use them wisely)
+- **4 HP Potion** — uses the best HP potion in your inventory
+  (you start with 3 HP Potions; buy more at the shop)
 - **C** — character panel: spend stat points with the + buttons
+- **I** — inventory: equip gear with Equip, use potions with Use,
+  unequip from the Equipped list
+- **E near the purple Shopkeeper in town** — shop: buy stock (click Buy
+  twice to confirm), sell your items for half price, or Esc/Close to leave
+- **E near the cyan Storage Keeper in town** — storage: Deposit items
+  from your inventory, Withdraw them back, or Esc/Close to leave
 - Walk into the glowing blue portal at the top of town to go to the field
 - Walk into the glowing portal at the bottom of the field to return to town
 
@@ -126,7 +133,28 @@ real sprite later without changing the collision or movement code.
   gold, skill cooldowns, and potion count.
 - Potions are not restocked yet — shops and inventory come in Phase 4.
 
-## Next: Phase 4 (items and economy)
+## Phase 4: items and economy
 
-Inventory, equipment slots, shop and storage NPCs, loot tables, and
-spending gold — reusing the gold and drops already in the game.
+- Inventory lives in `GameManager` (autoload, so it survives scene
+  changes), with stackable consumables. Press I to open it.
+- Equipment slots: weapon, armor, headgear, accessory. Equipping applies
+  its bonuses immediately (attack, defence, max HP/SP) and shows in the
+  character panel. You start with a Wooden Sword and Leather Armor equipped.
+- Defence reduces monster damage, minimum 1 per hit, and the damage
+  number shown is the damage after defence.
+- Shop and storage NPCs stand in town (purple Shopkeeper, cyan Storage
+  Keeper). Walk up and press E; a "Press E" hint appears when in range.
+  Shop stock: 2 swords, 2 armors, 2 headgears, 2 rings, 3 potions.
+  Selling pays half the item's price. Storage is a separate stash,
+  one item per Deposit/Withdraw click.
+- Loot tables: monsters can drop an item on death, in addition to gold.
+  Slime drops a Small HP Potion (25%), Mushroom an SP Potion (20%),
+  Wolf a Wooden Ring (15%). Walk over a coloured pickup to collect it.
+  Item data lives in `data/items/*.tres`, edited the same way as monsters.
+- Key 4 now uses potions from your inventory instead of a separate count,
+  and the HUD potion count is the HP potions you actually carry.
+
+## Next: Phase 5 (quests and dungeon)
+
+Quests and dialogue, the dungeon with a boss, and quest rewards — reusing
+the inventory, shop, and combat systems already in the game.

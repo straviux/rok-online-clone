@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://scripts/world.gd" id="1_world"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
@@ -9,6 +9,7 @@
 [ext_resource type="Resource" path="res://data/slime.tres" id="6_slime"]
 [ext_resource type="Resource" path="res://data/mushroom.tres" id="7_mushroom"]
 [ext_resource type="Resource" path="res://data/wolf.tres" id="8_wolf"]
+[ext_resource type="PackedScene" path="res://scenes/ui/inventory_panel.tscn" id="10_inventory"]
 
 [sub_resource type="RectangleShape2D" id="Shape_tree"]
 size = Vector2(64, 64)
@@ -34,6 +35,8 @@ color = Color(0.35, 0.65, 0.35, 1)
 [node name="HUD" parent="." instance=ExtResource("4_hud")]
 
 [node name="CharacterPanel" parent="." instance=ExtResource("9_panel")]
+
+[node name="InventoryPanel" parent="." instance=ExtResource("10_inventory")]
 
 [node name="Player" parent="." instance=ExtResource("2_player")]
 position = Vector2(0, 470)

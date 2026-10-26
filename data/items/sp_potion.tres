@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/item_data.gd" id="1_data"]
+
+[resource]
+script = ExtResource("1_data")
+item_id = "sp_potion"
+item_name = "SP Potion"
+description = "Restores 30 SP."
+item_type = 4
+price = 30
+stackable = true
+color = Color(0.3, 0.5, 1, 1)
+heal_sp = 30

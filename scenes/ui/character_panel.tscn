@@ -9,7 +9,7 @@ script = ExtResource("1_panel")
 offset_left = 326.0
 offset_top = 124.0
 offset_right = 826.0
-offset_bottom = 584.0
+offset_bottom = 624.0
 color = Color(0.1, 0.1, 0.15, 0.95)
 
 [node name="TitleLabel" type="Label" parent="Panel"]
@@ -143,4 +143,18 @@ offset_left = 16.0
 offset_top = 408.0
 offset_right = 468.0
 offset_bottom = 436.0
+text = ""
+
+[node name="EquipmentLabel1" type="Label" parent="Panel"]
+offset_left = 16.0
+offset_top = 440.0
+offset_right = 468.0
+offset_bottom = 468.0
+text = ""
+
+[node name="EquipmentLabel2" type="Label" parent="Panel"]
+offset_left = 16.0
+offset_top = 472.0
+offset_right = 468.0
+offset_bottom = 500.0
 text = ""

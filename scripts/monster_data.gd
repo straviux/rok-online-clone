@@ -15,3 +15,7 @@ extends Resource
 @export var color: Color = Color(0.3, 0.9, 0.4, 1)
 @export var gold_drop: int = 3
 @export var respawn_time: float = 5.0
+# Phase 4 loot: one possible item drop, rolled on death.
+# Empty id = no item drop. Item ids match data/items/*.tres.
+@export var drop_item_id: String = ""
+@export var drop_chance: float = 0.0

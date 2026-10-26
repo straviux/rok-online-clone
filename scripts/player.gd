@@ -19,8 +19,11 @@ extends CharacterBody2D
 ## - WASD at any time cancels click movement (the target stays set).
 ## - While a target is alive and in range, basic attacks fire automatically.
 ## - Hotkeys: 1 Power Strike (5 SP, 3s), 2 Heal (10 SP, 5s),
-##   3 Fire Bolt (8 SP, 4s, 300 range), 4 HP Potion (+30 HP, starts with 3).
+##   3 Fire Bolt (8 SP, 4s, 300 range), 4 use an HP potion from inventory.
 ## - C opens the character panel, where stat points are spent with + buttons.
+## - I opens inventory, E near an NPC opens shop/storage (Phase 4).
+## - Phase 4: equipped items add their bonuses in recalculate_derived(),
+##   and defence reduces monster damage (minimum 1 per hit).
 ## - On death the player respawns in town at full HP/SP (gold kept for now).
 
 @export var speed: float = 220.0
@@ -49,8 +52,8 @@ var hp_regen: float = 2.0
 var sp_regen: float = 1.5
 var heal_amount: int = 20
 var fire_bolt_damage: int = 15
+var defence: int = 0
 
-var potions: int = 3
 var target: Node = null
 var dying: bool = false
 
@@ -78,9 +81,21 @@ func xp_to_next() -> int:
 
 
 func recalculate_derived() -> void:
-	max_hp = 100 + stat_vit * 10 + (level - 1) * 10
-	max_sp = 50 + stat_int * 8 + (level - 1) * 5
-	attack_damage = 10 + stat_str * 2
+	# Phase 4 equipment bonuses, summed from GameManager.equipment.
+	var eq_attack: int = 0
+	var eq_defence: int = 0
+	var eq_hp: int = 0
+	var eq_sp: int = 0
+	for equipped: ItemData in GameManager.equipment.values():
+		if equipped != null:
+			eq_attack += equipped.attack_bonus
+			eq_defence += equipped.defence_bonus
+			eq_hp += equipped.hp_bonus
+			eq_sp += equipped.sp_bonus
+	max_hp = 100 + stat_vit * 10 + (level - 1) * 10 + eq_hp
+	max_sp = 50 + stat_int * 8 + (level - 1) * 5 + eq_sp
+	attack_damage = 10 + stat_str * 2 + eq_attack
+	defence = eq_defence
 	attack_range = 80.0 + stat_dex * 2.0
 	attack_cooldown = max(0.4, 0.8 - stat_agi * 0.02)
 	crit_chance = 0.05 + stat_luk * 0.01
@@ -172,10 +187,11 @@ func _input(event: InputEvent) -> void:
 
 
 func _target_at_mouse() -> void:
-	# Clicking a + button on the character panel must not retarget/move.
-	for panel: Node in get_tree().get_nodes_in_group("character_panel"):
-		if panel.visible:
-			return
+	# Clicking buttons on any open panel must not retarget/move.
+	for group_name: String in ["character_panel", "inventory_panel", "shop_panel", "storage_panel"]:
+		for panel: Node in get_tree().get_nodes_in_group(group_name):
+			if panel.visible:
+				return
 	var mouse_position: Vector2 = get_global_mouse_position()
 	var space_state: PhysicsDirectSpaceState2D = get_world_2d().direct_space_state
 	var query := PhysicsPointQueryParameters2D.new()
@@ -259,28 +275,56 @@ func _cast_fire_bolt() -> void:
 
 
 func _use_potion() -> void:
-	if potions <= 0:
-		_show_message("No potions", Color(1.0, 1.0, 1.0, 1.0))
-		return
-	if hp >= float(max_hp):
-		_show_message("HP full", Color(0.4, 1.0, 0.4, 1.0))
-		return
-	potions -= 1
-	hp = min(float(max_hp), hp + 30.0)
-	_show_message("+30", Color(0.4, 1.0, 0.4, 1.0))
+	# Key 4: best HP potion in the inventory, or nothing.
+	for item_id: String in ["hp_potion", "small_hp_potion"]:
+		for slot: Dictionary in GameManager.inventory:
+			if slot["item"].item_id == item_id:
+				use_item(slot["item"])
+				return
+	_show_message("No potions", Color(1.0, 1.0, 1.0, 1.0))
 
 
-func take_damage(amount: int) -> void:
+## Use one consumable from the inventory (inventory panel and key 4).
+## Returns false if it could not be used (not a consumable, or already full).
+func use_item(item: ItemData) -> bool:
+	if item.item_type != ItemData.ItemType.CONSUMABLE:
+		return false
+	var hp_full: bool = item.heal_hp == 0 or hp >= float(max_hp)
+	var sp_full: bool = item.heal_sp == 0 or sp >= float(max_sp)
+	if hp_full and sp_full:
+		_show_message("Full", Color(0.4, 1.0, 0.4, 1.0))
+		return false
+	if not GameManager.remove_item(item, 1):
+		return false
+	if item.heal_hp > 0:
+		hp = min(float(max_hp), hp + float(item.heal_hp))
+		_show_message("+%d" % item.heal_hp, Color(0.4, 1.0, 0.4, 1.0))
+	if item.heal_sp > 0:
+		sp = min(float(max_sp), sp + float(item.heal_sp))
+		_show_message("+%d SP" % item.heal_sp, Color(0.4, 0.7, 1.0, 1.0))
+	return true
+
+
+func take_damage(amount: int) -> int:
 	if dying:
-		return
-	hp -= float(amount)
+		return 0
+	# Phase 4 defence: at least 1 damage always gets through.
+	var effective: int = max(1, amount - defence)
+	hp -= float(effective)
 	if hp <= 0.0:
 		hp = 0.0
 		dying = true
 		set_target(null)
-		# Brief pause so the killing hit is visible, then respawn in town.
-		await get_tree().create_timer(0.5).timeout
-		GameManager.travel_to("res://scenes/world/town.tscn", Vector2(0, 300))
+		# The pause-then-respawn lives in its own coroutine, so this
+		# function can still return the damage dealt right away.
+		_respawn_after_death()
+	return effective
+
+
+func _respawn_after_death() -> void:
+	# Brief pause so the killing hit is visible, then respawn in town.
+	await get_tree().create_timer(0.5).timeout
+	GameManager.travel_to("res://scenes/world/town.tscn", Vector2(0, 300))
 
 
 func _physics_process(delta: float) -> void:

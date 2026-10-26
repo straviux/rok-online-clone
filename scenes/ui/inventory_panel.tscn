@@ -1,0 +1,53 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/inventory_panel.gd" id="1_panel"]
+
+[node name="InventoryPanel" type="CanvasLayer"]
+script = ExtResource("1_panel")
+
+[node name="Panel" type="ColorRect" parent="."]
+offset_left = 226.0
+offset_top = 54.0
+offset_right = 926.0
+offset_bottom = 614.0
+color = Color(0.1, 0.1, 0.15, 0.95)
+
+[node name="TitleLabel" type="Label" parent="Panel"]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 684.0
+offset_bottom = 44.0
+text = "Inventory (press I to close)"
+
+[node name="GoldLabel" type="Label" parent="Panel"]
+offset_left = 16.0
+offset_top = 44.0
+offset_right = 684.0
+offset_bottom = 72.0
+text = "Gold: 0"
+
+[node name="EquippedLabel" type="Label" parent="Panel"]
+offset_left = 16.0
+offset_top = 76.0
+offset_right = 684.0
+offset_bottom = 104.0
+text = "Equipped"
+
+[node name="EquippedBox" type="VBoxContainer" parent="Panel"]
+offset_left = 16.0
+offset_top = 104.0
+offset_right = 684.0
+offset_bottom = 232.0
+
+[node name="InventoryLabel" type="Label" parent="Panel"]
+offset_left = 16.0
+offset_top = 236.0
+offset_right = 684.0
+offset_bottom = 264.0
+text = "Inventory"
+
+[node name="InventoryBox" type="VBoxContainer" parent="Panel"]
+offset_left = 16.0
+offset_top = 264.0
+offset_right = 684.0
+offset_bottom = 544.0

@@ -40,11 +40,11 @@ func _process(_delta: float) -> void:
 	else:
 		level_label.text = "Lv %d" % player.level
 	gold_label.text = "Gold: %d" % GameManager.gold
-	skill_label.text = "1 Power Strike [%s]  2 Heal [%s]  3 Fire Bolt [%s]  4 HP Potion x%d  |  C Stats" % [
+	skill_label.text = "1 Power Strike [%s]  2 Heal [%s]  3 Fire Bolt [%s]  4 HP Potion x%d  |  C Stats  I Inventory" % [
 		_cooldown_text(player.power_strike_timer),
 		_cooldown_text(player.heal_timer),
 		_cooldown_text(player.fire_bolt_timer),
-		player.potions,
+		GameManager.count_item("hp_potion") + GameManager.count_item("small_hp_potion"),
 	]
 
 	var target: Node = player.target
