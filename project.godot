@@ -15,12 +15,18 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 [application]
 
 config/name="Ragnarok-like Game"
+<<<<<<< HEAD
 run/main_scene="res://scenes/world/town.tscn"
 config/features=PackedStringArray("4.7")
+=======
+run/main_scene="res://scenes/ui/title_screen.tscn"
+config/features=PackedStringArray("4.2")
+>>>>>>> 72240ca1fa1c6b36c94d7f36b992850752e8e4a7
 
 [autoload]
 
 GameManager="*res://scripts/game_manager.gd"
+SFX="*res://scripts/sfx.gd"
 
 [rendering]
 

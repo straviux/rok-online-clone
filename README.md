@@ -1,10 +1,12 @@
-# Ragnarok-like Game — Phase 1 + Phase 2 + Phase 3 + Phase 4 + Phase 5
+# Ragnarok-like Game — Phases 1–6 (v1 complete)
 
 A playable Godot 4 starting point: walk around, collide with the world,
 travel between town and field, fight monsters, gain XP and levels,
 spend stat points, cast skills, collect loot, equip gear, spend
 gold at the shop, take quests from the Elder, and clear the dungeon
-boss. Save/load, title screen, and pause menu are Phase 6.
+boss. Phase 6 adds the title screen, pause menu, save/load, sound
+placeholders, and a balance pass — the v1 acceptance test (defeat the
+boss, save, quit, continue from that save) now works end to end.
 
 ## How to run it (Windows)
 
@@ -34,7 +36,10 @@ You should spawn in town as a blue box character.
 - **Esc** — closes only the frontmost open panel, one per press
   (front to back: storage, shop, inventory, character, matching the
   order the panels are drawn in). Every panel also has a Close button
-  at its top right, which closes that panel directly.
+  at its top right, which closes that panel directly. With no panel
+  open, Esc opens the pause menu instead (Esc inside it resumes).
+  Esc no longer cancels an armed skill — press the skill key again,
+  or click the ground, for that.
 - **E near the purple Shopkeeper in town** — shop: buy stock (click Buy
   twice to confirm), sell your items for half price, or Esc/Close to leave
 - **E near the cyan Storage Keeper in town** — storage: Deposit items
@@ -48,6 +53,17 @@ You should spawn in town as a blue box character.
   to return to the field
 - Walk into the glowing blue portal at the top of town to go to the field
 - Walk into the glowing portal at the bottom of the field to return to town
+- **Title screen** (the game now starts here) — New Game, Continue
+  (disabled when no save exists), Quit. Continue loads your manual
+  save, or the autosave if that is all there is.
+- **Pause menu (Esc)** — Resume, Save Game, Load Game, a volume
+  slider, a fullscreen toggle, and Quit to Title. Saving writes a
+  manual slot; entering town always writes an autosave slot, so
+  quitting from town never loses progress. Saves live on your device
+  (Godot's user folder) and hold position, map, level, XP, stats and
+  stat points, HP/SP, gold, inventory, equipment, storage, quest
+  progress, and whether the dungeon boss is defeated. A damaged or
+  out-of-date save reports an error instead of crashing.
 
 Collision is real: houses, trees, rocks, and the map edges block you.
 The camera follows the player. If a monster kills you, you respawn in
@@ -74,7 +90,7 @@ town at full HP (gold kept for now).
 ## What is in here
 
 ```
-project.godot                  Main scene = town, GameManager autoload
+project.godot                  Main scene = title screen, GameManager + SFX autoloads
 scripts/
   game_manager.gd              Autoload: carries the spawn point across scenes
   player.gd                    CharacterBody2D, WASD/arrows, placeholder sprite
@@ -257,7 +273,31 @@ credit required.
   damage (before defence) if they are within 150 pixels — step back
   to avoid it. The boss respawns after 30 seconds, like other monsters.
 
-## Next: Phase 6 (polish and save)
+## Phase 6: polish and save (v1 complete)
 
-Title screen, pause menu, save/load, sound placeholders, and a
-balance pass — reusing everything built so far.
+- **Title screen** (`scenes/ui/title_screen.tscn`): New Game starts
+  fresh in town; Continue restores the manual save, else the autosave,
+  and is disabled when neither exists; Quit closes the game.
+- **Pause menu** (`scenes/ui/pause_menu.tscn`, spawned by the HUD so
+  it works in town, field, and dungeon with no scene edits): Resume,
+  Save Game, Load Game, volume slider, fullscreen toggle, Quit to
+  Title. The menu runs while the tree is paused (process mode Always),
+  which is what keeps its buttons and Esc-to-resume working.
+- **Save/load** (in `scripts/game_manager.gd`, ConfigFile slots in
+  user://): manual slot from the pause menu plus an autosave written
+  on entering town. Loads are validated into temporary values first,
+  so a missing, partial, or corrupted file reports a plain-word error
+  and changes nothing, instead of crashing or half-loading. Loading
+  restores the saved map, position, stats, HP/SP, inventory,
+  equipment, storage, quests, and dungeon completion.
+- **Sound placeholders** (`scripts/sfx.gd` autoload): no audio files
+  in the repo, on purpose (same binary rule as sprites), so SFX is a
+  named-hook system — `SFX.play("hit")`, `"player_hurt"`, `"pickup"`,
+  `"ui_click"`, `"portal"`, `"boss_roar"` — wired at every event, with
+  real sounds able to drop into that one file later. Volume and
+  fullscreen persist to user://settings.cfg.
+- **Balance pass** (small, in data only): Goblin damage 20 → 18 (a
+  regular dungeon mob should not hit nearly as hard as the 25-damage
+  boss), Wolf XP 25 → 30 (aggressive, fast, 60 HP — reward matches
+  the effort vs slimes), HP Potion price 40 → 35 gold (boss-fight
+  sustain is less grindy). Nothing else in combat changed.

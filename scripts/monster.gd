@@ -108,6 +108,7 @@ func set_targeted(is_targeted: bool) -> void:
 func take_damage(amount: int) -> void:
 	if dead:
 		return
+	SFX.play("hit")
 	hp -= amount
 	hp_bar.value = hp
 	sprite.modulate = Color(1.0, 0.4, 0.4, 1.0)
@@ -118,6 +119,10 @@ func take_damage(amount: int) -> void:
 
 
 func _die() -> void:
+	if monster_id == "boss":
+		# Phase 6: clearing the dungeon is a saved fact, not just a
+		# quest step — it survives the boss respawning 30s later.
+		GameManager.dungeon_boss_defeated = true
 	dead = true
 	visible = false
 	collision_shape.disabled = true
@@ -256,6 +261,7 @@ func _physics_process(delta: float) -> void:
 			_special_timer = special_cooldown
 			if player_distance <= special_range:
 				_attack_anim_timer = 0.4
+				SFX.play("boss_roar")
 				player.take_damage(special_damage)
 				_spawn_damage_number_at(player.global_position, "Roar!", Color(1.0, 0.3, 0.3, 1.0))
 
