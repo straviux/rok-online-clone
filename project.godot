@@ -8,12 +8,13 @@ config_version=5
 [application]
 
 config/name="Ragnarok-like Game"
-run/main_scene="res://scenes/world/town.tscn"
+run/main_scene="res://scenes/ui/title_screen.tscn"
 config/features=PackedStringArray("4.2")
 
 [autoload]
 
 GameManager="*res://scripts/game_manager.gd"
+SFX="*res://scripts/sfx.gd"
 
 [display]
 

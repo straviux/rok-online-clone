@@ -28,6 +28,7 @@ func _on_body_entered(body: Node2D) -> void:
 	if body.name != "Player":
 		return
 	if item != null:
+		SFX.play("pickup")
 		GameManager.add_item(item, 1)
 		# Phase 5: collect quests count pickups, not inventory totals,
 		# so herbs found before accepting the quest do not count.

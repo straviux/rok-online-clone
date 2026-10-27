@@ -43,6 +43,9 @@ var player_sp: float = -1.0
 # Elder), "active", "done".
 var quest_order: Array = ["meet_elder", "slime_hunt", "herb_gathering", "wolf_hunt", "dungeon_boss"]
 var quests: Dictionary = {}
+# Phase 6: set once, when the Dungeon Guardian dies (monster.gd). It
+# survives the boss respawning, and it is part of every save file.
+var dungeon_boss_defeated: bool = false
 
 
 func capture_player_state(player: Node, keep_hp: bool = true) -> void:
@@ -74,23 +77,31 @@ func travel_to(scene_path: String, spawn: Vector2, keep_hp: bool = true) -> void
 	capture_player_state(get_tree().get_first_node_in_group("player"), keep_hp)
 	spawn_position = spawn
 	has_spawn_position = true
+	if scene_path == "res://scenes/world/town.tscn":
+		# Phase 6 autosave: arriving in town always writes the
+		# autosave slot for the town just entered.
+		_write_save("autosave", scene_path, spawn)
 	get_tree().change_scene_to_file(scene_path)
 
 
 func _ready() -> void:
 	# Starting gear and potions, once, on a fresh game.
 	if inventory.is_empty() and equipment["weapon"] == null:
-		var hp_potion: ItemData = preload("res://data/items/hp_potion.tres")
-		var wooden_sword: ItemData = preload("res://data/items/wooden_sword.tres")
-		var leather_armor: ItemData = preload("res://data/items/leather_armor.tres")
-		add_item(hp_potion, 3)
-		add_item(wooden_sword, 1)
-		add_item(leather_armor, 1)
-		equip(wooden_sword)
-		equip(leather_armor)
+		_give_starting_gear()
 	# Quests init on their own guard, not inside the starting-gear
 	# block, so they are set up even if the inventory is not empty.
 	_init_quests()
+
+
+func _give_starting_gear() -> void:
+	var hp_potion: ItemData = preload("res://data/items/hp_potion.tres")
+	var wooden_sword: ItemData = preload("res://data/items/wooden_sword.tres")
+	var leather_armor: ItemData = preload("res://data/items/leather_armor.tres")
+	add_item(hp_potion, 3)
+	add_item(wooden_sword, 1)
+	add_item(leather_armor, 1)
+	equip(wooden_sword)
+	equip(leather_armor)
 
 
 func _init_quests() -> void:
@@ -172,11 +183,27 @@ func _complete_quest(quest_id: String) -> void:
 			next_quest["state"] = "available"
 
 
+func _item_catalog() -> Dictionary:
+	# Every item id in data/items/, so saves can rebuild inventories
+	# and equipment from ids alone. Quest rewards use this too.
+	return {
+		"herb": preload("res://data/items/herb.tres"),
+		"hp_potion": preload("res://data/items/hp_potion.tres"),
+		"iron_armor": preload("res://data/items/iron_armor.tres"),
+		"iron_helm": preload("res://data/items/iron_helm.tres"),
+		"iron_sword": preload("res://data/items/iron_sword.tres"),
+		"leather_armor": preload("res://data/items/leather_armor.tres"),
+		"novice_cap": preload("res://data/items/novice_cap.tres"),
+		"silver_ring": preload("res://data/items/silver_ring.tres"),
+		"small_hp_potion": preload("res://data/items/small_hp_potion.tres"),
+		"sp_potion": preload("res://data/items/sp_potion.tres"),
+		"wooden_ring": preload("res://data/items/wooden_ring.tres"),
+		"wooden_sword": preload("res://data/items/wooden_sword.tres"),
+	}
+
+
 func _load_item(item_id: String) -> ItemData:
-	match item_id:
-		"iron_sword":
-			return preload("res://data/items/iron_sword.tres")
-	return null
+	return _item_catalog().get(item_id, null)
 
 
 func _show_quest_message(text_value: String) -> void:
@@ -263,3 +290,259 @@ func withdraw_item(item: ItemData) -> bool:
 		return false
 	_add_to_list(inventory, item, 1)
 	return true
+
+# ------------------------------------------------------------------
+# Phase 6: save/load. One ConfigFile per slot in user://, so saves
+# live on the player's device and survive closing the game:
+# "manual" is the pause menu's Save button, "autosave" is written
+# automatically on entering town (see travel_to).
+# A load is validated into temporary values FIRST and only applied
+# once every check passes, so a missing, partial, or corrupted file
+# can never leave the game in a half-loaded state: it just reports
+# an error and the caller stays where it was (title or pause menu).
+
+const SAVE_VERSION: int = 1
+const KNOWN_MAPS: Array = [
+	"res://scenes/world/town.tscn",
+	"res://scenes/world/field.tscn",
+	"res://scenes/world/dungeon.tscn",
+]
+const _QUEST_STATES: Array = ["locked", "available", "active", "done"]
+
+
+func _save_path(slot: String) -> String:
+	return "user://save_" + slot + ".cfg"
+
+
+func has_save(slot: String) -> bool:
+	return FileAccess.file_exists(_save_path(slot))
+
+
+func start_new_game() -> void:
+	# Fresh state, then town at its default spawn. Autoloads are never
+	# re-created, so _ready()'s one-time gear block cannot do this.
+	gold = 0
+	inventory = []
+	storage = []
+	equipment = {"weapon": null, "armor": null, "headgear": null, "accessory": null}
+	player_level = 1
+	player_xp = 0
+	player_stat_points = 0
+	player_stat_str = 5
+	player_stat_agi = 5
+	player_stat_vit = 5
+	player_stat_int = 5
+	player_stat_dex = 5
+	player_stat_luk = 5
+	player_hp = -1.0
+	player_sp = -1.0
+	has_player_state = false
+	dungeon_boss_defeated = false
+	quests = {}
+	_init_quests()
+	_give_starting_gear()
+	spawn_position = Vector2(0, 300)
+	has_spawn_position = true
+	get_tree().change_scene_to_file("res://scenes/world/town.tscn")
+
+
+func save_game(slot: String) -> String:
+	# "" means saved; anything else is a plain-word error for the UI.
+	var player: Node = get_tree().get_first_node_in_group("player")
+	if player == null:
+		return "Cannot save right now: no adventurer is loaded."
+	var scene: Node = get_tree().current_scene
+	if scene == null or scene.scene_file_path not in KNOWN_MAPS:
+		return "Cannot save from here."
+	capture_player_state(player, true)
+	return _write_save(slot, scene.scene_file_path, player.position)
+
+
+func _write_save(slot: String, map_path: String, position: Vector2) -> String:
+	var cfg := ConfigFile.new()
+	cfg.set_value("save", "version", SAVE_VERSION)
+	cfg.set_value("save", "map", map_path)
+	cfg.set_value("save", "position", position)
+	cfg.set_value("save", "gold", gold)
+	cfg.set_value("save", "boss_defeated", dungeon_boss_defeated)
+	cfg.set_value("save", "level", player_level)
+	cfg.set_value("save", "xp", player_xp)
+	cfg.set_value("save", "stat_points", player_stat_points)
+	cfg.set_value("save", "stats", {
+		"str": player_stat_str, "agi": player_stat_agi, "vit": player_stat_vit,
+		"int": player_stat_int, "dex": player_stat_dex, "luk": player_stat_luk,
+	})
+	cfg.set_value("save", "hp", player_hp)
+	cfg.set_value("save", "sp", player_sp)
+	cfg.set_value("save", "inventory", _slots_to_data(inventory))
+	cfg.set_value("save", "storage", _slots_to_data(storage))
+	var equipment_ids: Dictionary = {}
+	for slot_name: String in equipment:
+		var equipped: ItemData = equipment[slot_name]
+		equipment_ids[slot_name] = equipped.item_id if equipped != null else ""
+	cfg.set_value("save", "equipment", equipment_ids)
+	var quest_data: Array = []
+	for quest_id: String in quest_order:
+		var quest: Dictionary = quests.get(quest_id, {})
+		if not quest.is_empty():
+			quest_data.append({"id": quest_id, "state": quest["state"], "progress": quest["progress"]})
+	cfg.set_value("save", "quests", quest_data)
+	var err: Error = cfg.save(_save_path(slot))
+	if err != OK:
+		return "The save could not be written."
+	return ""
+
+
+func load_game(slot: String) -> String:
+	# "" means loaded (the scene has changed); anything else is a
+	# plain-word error and nothing was applied.
+	if not has_save(slot):
+		return "No save found."
+	var cfg := ConfigFile.new()
+	if cfg.load(_save_path(slot)) != OK:
+		return "That save file could not be read."
+	# --- validate everything into locals before touching live state ---
+	# Every get_value below carries a default that FAILS its check, so
+	# a partial file reports a plain error instead of printing engine
+	# errors about missing keys (a null default would do the latter).
+	var version: Variant = cfg.get_value("save", "version", -1)
+	if typeof(version) != TYPE_INT or version != SAVE_VERSION:
+		return "That save is from an unknown version."
+	var map_path: Variant = cfg.get_value("save", "map", "")
+	if typeof(map_path) != TYPE_STRING or map_path not in KNOWN_MAPS:
+		return "That save points to a place that no longer exists."
+	var position: Variant = cfg.get_value("save", "position", Vector2(1e10, 1e10))
+	if typeof(position) != TYPE_VECTOR2 or not _is_finite_vector(position):
+		return "That save has a broken position."
+	var gold_value: Variant = cfg.get_value("save", "gold", -1)
+	if typeof(gold_value) != TYPE_INT or gold_value < 0:
+		return "That save has broken gold."
+	var boss_value: Variant = cfg.get_value("save", "boss_defeated", -1)
+	if typeof(boss_value) != TYPE_BOOL:
+		return "That save has a broken dungeon record."
+	var level_value: Variant = cfg.get_value("save", "level", -1)
+	var xp_value: Variant = cfg.get_value("save", "xp", -1)
+	var points_value: Variant = cfg.get_value("save", "stat_points", -1)
+	if typeof(level_value) != TYPE_INT or level_value < 1 or level_value > 99:
+		return "That save has a broken level."
+	if typeof(xp_value) != TYPE_INT or xp_value < 0:
+		return "That save has broken XP."
+	if typeof(points_value) != TYPE_INT or points_value < 0:
+		return "That save has broken stat points."
+	var stats_value: Variant = cfg.get_value("save", "stats", {})
+	if typeof(stats_value) != TYPE_DICTIONARY:
+		return "That save has broken stats."
+	var stats: Dictionary = {}
+	for key: String in ["str", "agi", "vit", "int", "dex", "luk"]:
+		var stat: Variant = stats_value.get(key, null)
+		if typeof(stat) != TYPE_INT or stat < 1 or stat > 99:
+			return "That save has a broken stat."
+		stats[key] = stat
+	var hp_value: Variant = cfg.get_value("save", "hp", -999.0)
+	var sp_value: Variant = cfg.get_value("save", "sp", -999.0)
+	if (typeof(hp_value) != TYPE_INT and typeof(hp_value) != TYPE_FLOAT) or hp_value < -1.0:
+		return "That save has broken health."
+	if (typeof(sp_value) != TYPE_INT and typeof(sp_value) != TYPE_FLOAT) or sp_value < -1.0:
+		return "That save has broken mana."
+	var inventory_value: Variant = cfg.get_value("save", "inventory", -1)
+	var storage_value: Variant = cfg.get_value("save", "storage", -1)
+	var equipment_value: Variant = cfg.get_value("save", "equipment", -1)
+	var quests_value: Variant = cfg.get_value("save", "quests", -1)
+	if typeof(inventory_value) != TYPE_ARRAY or typeof(storage_value) != TYPE_ARRAY:
+		return "That save has broken items."
+	if typeof(equipment_value) != TYPE_DICTIONARY or typeof(quests_value) != TYPE_ARRAY:
+		return "That save has broken equipment or quests."
+	# Malformed entries and unknown item ids are skipped by
+	# _data_to_slots (an item removed from the game must not brick an
+	# old save); only a wrong top-level type fails the load, above.
+	var new_inventory: Array = _data_to_slots(inventory_value)
+	var new_storage: Array = _data_to_slots(storage_value)
+	var new_equipment: Dictionary = {"weapon": null, "armor": null, "headgear": null, "accessory": null}
+	var catalog: Dictionary = _item_catalog()
+	for slot_name: String in new_equipment:
+		var item_id: Variant = equipment_value.get(slot_name, "")
+		if typeof(item_id) == TYPE_STRING and item_id != "":
+			# Unknown ids become an empty slot, never a crash: an item
+			# removed from the game must not brick an old save.
+			new_equipment[slot_name] = catalog.get(item_id, null)
+	var new_quests: Dictionary = {}
+	for entry: Variant in quests_value:
+		if typeof(entry) != TYPE_DICTIONARY:
+			return "That save has broken quests."
+		var quest_id: Variant = entry.get("id", "")
+		var quest_state: Variant = entry.get("state", "")
+		var quest_progress: Variant = entry.get("progress", 0)
+		if typeof(quest_id) != TYPE_STRING or quest_id not in quest_order:
+			continue
+		if typeof(quest_state) != TYPE_STRING or quest_state not in _QUEST_STATES:
+			return "That save has broken quests."
+		if typeof(quest_progress) != TYPE_INT or quest_progress < 0:
+			return "That save has broken quests."
+		new_quests[quest_id] = {"state": quest_state, "progress": quest_progress}
+	# --- every check passed: apply, then change to the saved map ---
+	gold = gold_value
+	dungeon_boss_defeated = boss_value
+	player_level = level_value
+	player_xp = xp_value
+	player_stat_points = points_value
+	player_stat_str = stats["str"]
+	player_stat_agi = stats["agi"]
+	player_stat_vit = stats["vit"]
+	player_stat_int = stats["int"]
+	player_stat_dex = stats["dex"]
+	player_stat_luk = stats["luk"]
+	# 0 or less health on load means "came back full", the same
+	# sentinel death respawn uses (-1). The new Player clamps to max.
+	player_hp = -1.0 if float(hp_value) <= 0.0 else float(hp_value)
+	player_sp = -1.0 if float(sp_value) <= 0.0 else float(sp_value)
+	has_player_state = true
+	inventory = new_inventory
+	storage = new_storage
+	equipment = new_equipment
+	quests = {}
+	_init_quests()
+	for quest_id: String in new_quests:
+		var saved: Dictionary = new_quests[quest_id]
+		var quest: Dictionary = quests[quest_id]
+		var data: QuestData = quest["data"]
+		quest["state"] = saved["state"]
+		quest["progress"] = mini(saved["progress"], data.amount)
+		if quest["state"] == "done":
+			quest["progress"] = data.amount
+	spawn_position = Vector2(clampf(position.x, -1600.0, 1600.0), clampf(position.y, -1200.0, 1200.0))
+	has_spawn_position = true
+	get_tree().paused = false
+	get_tree().change_scene_to_file(map_path)
+	return ""
+
+
+func _is_finite_vector(value: Vector2) -> bool:
+	return absf(value.x) < 1e9 and absf(value.y) < 1e9 and value.x == value.x and value.y == value.y
+
+
+func _slots_to_data(list: Array) -> Array:
+	var data: Array = []
+	for slot: Dictionary in list:
+		var item: ItemData = slot["item"]
+		data.append({"id": item.item_id, "count": slot["count"]})
+	return data
+
+
+func _data_to_slots(data: Array) -> Array:
+	var list: Array = []
+	var catalog: Dictionary = _item_catalog()
+	for entry: Variant in data:
+		if typeof(entry) != TYPE_DICTIONARY:
+			continue
+		var item_id: Variant = entry.get("id", "")
+		var count: Variant = entry.get("count", 0)
+		if typeof(item_id) != TYPE_STRING or typeof(count) != TYPE_INT:
+			continue
+		var item: ItemData = catalog.get(item_id, null)
+		if item == null:
+			continue
+		if not item.stackable:
+			count = 1
+		_add_to_list(list, item, clampi(count, 1, 999))
+	return list
+

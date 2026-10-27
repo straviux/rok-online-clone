@@ -16,4 +16,5 @@ func _ready() -> void:
 
 func _on_body_entered(body: Node2D) -> void:
 	if body.name == "Player" and not target_scene_path.is_empty():
+		SFX.play("portal")
 		GameManager.travel_to(target_scene_path, spawn_position)

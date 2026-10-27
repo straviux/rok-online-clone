@@ -483,6 +483,7 @@ func take_damage(amount: int) -> int:
 		return 0
 	# Phase 4 defence: at least 1 damage always gets through.
 	var effective: int = max(1, amount - defence)
+	SFX.play("player_hurt")
 	hp -= float(effective)
 	if hp <= 0.0:
 		hp = 0.0

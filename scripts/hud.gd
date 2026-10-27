@@ -14,6 +14,10 @@ extends CanvasLayer
 @onready var cast_bar: ProgressBar = $CastBar
 @onready var xp_label: Label = $XPLabel
 
+# Phase 6 pause menu, built lazily on first Esc (see _input).
+var _pause_menu_scene: PackedScene = preload("res://scenes/ui/pause_menu.tscn")
+var _pause_menu: Node = null
+
 
 func _ready() -> void:
 	# UI pack icons next to the bars (textures are code-generated, so
@@ -35,7 +39,13 @@ func _input(event: InputEvent) -> void:
 	# Esc itself, one press closed them all. Order here is the panels'
 	# scene order (later = drawn in front): dialogue, quest log,
 	# storage, shop, inventory, character. Press Esc repeatedly to
-	# close them front to back.
+	# close them front to back. Only when no panel is open does Esc
+	# open the Phase 6 pause menu; Esc inside that menu resumes
+	# (handled by the menu itself, since the tree is paused then and
+	# this HUD no longer receives input).
+	# Note: Esc no longer cancels an armed skill — that is now the
+	# same skill key, or a ground click, as before. An armed skill
+	# simply stays armed under the pause menu.
 	if event is InputEventKey:
 		if event.keycode == KEY_ESCAPE and event.pressed and not event.echo:
 			for group_name: String in ["dialogue_panel", "quest_log_panel", "storage_panel", "shop_panel", "inventory_panel", "character_panel"]:
@@ -43,15 +53,11 @@ func _input(event: InputEvent) -> void:
 					if panel.visible:
 						panel.visible = false
 						return
-			# No panel open: Esc cancels an armed skill or a cast chase.
-			var player_node: Node = get_tree().get_first_node_in_group("player")
-			if player_node != null:
-				if player_node.pending_skill != "":
-					player_node.pending_skill = ""
-				if player_node.cast_chase_skill != "":
-					player_node.cast_chase_skill = ""
-					player_node.click_moving = false
-					player_node.click_chasing = false
+			# No panel open: open the pause menu (built once, reused).
+			if _pause_menu == null:
+				_pause_menu = _pause_menu_scene.instantiate()
+				add_child(_pause_menu)
+			_pause_menu.open()
 
 
 func _cooldown_text(timer: float) -> String:

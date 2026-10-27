@@ -95,7 +95,7 @@ offset_left = 16.0
 offset_top = 610.0
 offset_right = 1100.0
 offset_bottom = 640.0
-text = "WASD/click to move. Click monster to attack. 1 Strike, 3 Bolt: press the key, then click a monster. 2 Heal, 4 Potion. C Stats, I Inventory, Q Quests, E NPCs, Esc close front."
+text = "WASD/click to move. Click monster to attack. 1 Strike, 3 Bolt: press the key, then click a monster. 2 Heal, 4 Potion. C Stats, I Inventory, Q Quests, E NPCs, Esc panels/pause."
 
 [node name="HeartIcon" type="TextureRect" parent="."]
 offset_left = 24.0
